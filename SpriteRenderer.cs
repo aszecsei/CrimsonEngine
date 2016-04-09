@@ -23,7 +23,7 @@ namespace CrimsonEngine
             if(Diffuse  != null)
             {
                 spriteBatch.Draw(texture: Diffuse, 
-                    position: new Vector2(GameObject.Transform.GlobalPosition.X - Origin.X, GameObject.Transform.GlobalPosition.Y - Origin.Y), 
+                    position: new Vector2(GameObject.Transform.GlobalPosition.X, GameObject.Transform.GlobalPosition.Y), 
                     color: TintColor, 
                     rotation: GameObject.Transform.GlobalRotation, 
                     origin: Origin, 

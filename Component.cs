@@ -13,7 +13,7 @@ namespace CrimsonEngine
     {
         public bool isActive = true;
 
-        public void Update(GameTime gameTime) { }
+        public virtual void Update(GameTime gameTime) { }
 
         public GameObject GameObject
         {

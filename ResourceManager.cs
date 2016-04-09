@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace CrimsonEngine
 {
-    class ResourceManager
+    public class ResourceManager
     {
-        private static Dictionary<Type, Dictionary<String, Object>> _resources;
+        private static Dictionary<Type, Dictionary<String, Object>> _resources = new Dictionary<Type, Dictionary<string, object>>();
 
         public static void StoreResource<T>(String name, T obj)
         {
-            if(_resources[typeof(T)] == null)
+            if(!_resources.ContainsKey(typeof(T)))
             {
                 _resources[typeof(T)] = new Dictionary<string, object>();
             }
@@ -21,8 +21,8 @@ namespace CrimsonEngine
         }
 
         public static T GetResource<T>(String name)
-        {
-            if (_resources[typeof(T)] == null)
+        { 
+            if (!_resources.ContainsKey(typeof(T)))
             {
                 return default(T);
             }

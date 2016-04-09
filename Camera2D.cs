@@ -15,6 +15,8 @@ namespace CrimsonEngine
         public int ViewportWidth { get; set; }
         public int ViewportHeight { get; set; }
 
+        public static Camera2D main;
+
         public Vector2 ViewportCenter
         {
             get
@@ -26,6 +28,14 @@ namespace CrimsonEngine
         public Camera2D()
         {
             Zoom = 1.0f;
+        }
+
+        public void ZoomToFit(int width, int height)
+        {
+            float zoomW = (float)ViewportWidth / (float)width;
+            float zoomH = (float)ViewportHeight / (float)height;
+
+            Zoom = Math.Min(zoomW, zoomH);
         }
 
         public Matrix TranslationMatrix

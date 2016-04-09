@@ -17,9 +17,9 @@ namespace CrimsonEngine
             CurrentScene.Update(gameTime);
         }
 
-        public static void Draw(GraphicsDevice graphicsDevice, SpriteBatch spriteBatch, GameTime gameTime)
+        public static void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
-            CurrentScene.Draw(graphicsDevice, spriteBatch, gameTime);
+            CurrentScene.Draw(spriteBatch, gameTime);
         }
     }
 }
