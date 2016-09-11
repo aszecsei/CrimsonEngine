@@ -43,7 +43,10 @@ namespace CrimsonEngine
 
         public T GetComponent<T>() where T : Component
         {
-            return (T)Components[typeof(T)];
+            if (Components.ContainsKey(typeof(T)))
+                return (T)Components[typeof(T)];
+            else
+                return null;
         }
 
         public void Update(GameTime gameTime)
@@ -55,13 +58,43 @@ namespace CrimsonEngine
             }
         }
 
-        public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
+        public void DrawDiffuse(SpriteBatch spriteBatch, GameTime gameTime)
         {
             var renderers = Components.Values.OfType<Renderer>();
             foreach (Renderer r in renderers)
             {
                 if(r.isActive)
-                    r.Draw(spriteBatch, gameTime);
+                    r.DrawDiffuse(spriteBatch, gameTime);
+            }
+        }
+
+        public void DrawNormal(SpriteBatch spriteBatch, GameTime gameTime)
+        {
+            var renderers = Components.Values.OfType<Renderer>();
+            foreach (Renderer r in renderers)
+            {
+                if (r.isActive)
+                    r.DrawNormal(spriteBatch, gameTime);
+            }
+        }
+
+        public void DrawSpecular(SpriteBatch spriteBatch, GameTime gameTime)
+        {
+            var renderers = Components.Values.OfType<Renderer>();
+            foreach (Renderer r in renderers)
+            {
+                if (r.isActive)
+                    r.DrawSpecular(spriteBatch, gameTime);
+            }
+        }
+
+        public void DrawEmissive(SpriteBatch spriteBatch, GameTime gameTime)
+        {
+            var renderers = Components.Values.OfType<Renderer>();
+            foreach (Renderer r in renderers)
+            {
+                if (r.isActive)
+                    r.DrawEmissive(spriteBatch, gameTime);
             }
         }
 

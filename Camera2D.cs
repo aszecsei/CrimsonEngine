@@ -12,28 +12,26 @@ namespace CrimsonEngine
     {
         public float Zoom { get; set; }
 
-        public int ViewportWidth { get; set; }
-        public int ViewportHeight { get; set; }
-
         public static Camera2D main;
 
         public Vector2 ViewportCenter
         {
             get
             {
-                return new Vector2(ViewportWidth * 0.5f, ViewportHeight * 0.5f);
+                return (SceneManager.CurrentScene.InternalResolution != Vector2.Zero ? SceneManager.CurrentScene.InternalResolution * 0.5f : new Vector2(SceneManager.CurrentScene.GraphicsDevice.Viewport.Width, SceneManager.CurrentScene.GraphicsDevice.Viewport.Height) * 0.5f);
             }
         }
 
         public Camera2D()
         {
             Zoom = 1.0f;
+            Transform.GlobalPosition = new Vector3(0, 0, -1);
         }
 
         public void ZoomToFit(int width, int height)
         {
-            float zoomW = (float)ViewportWidth / (float)width;
-            float zoomH = (float)ViewportHeight / (float)height;
+            float zoomW = (SceneManager.CurrentScene.InternalResolution != Vector2.Zero ? SceneManager.CurrentScene.InternalResolution.X : SceneManager.CurrentScene.GraphicsDevice.Viewport.Width) / (float)width;
+            float zoomH = (SceneManager.CurrentScene.InternalResolution != Vector2.Zero ? SceneManager.CurrentScene.InternalResolution.Y : SceneManager.CurrentScene.GraphicsDevice.Viewport.Height) / (float)height;
 
             Zoom = Math.Min(zoomW, zoomH);
         }
@@ -54,7 +52,7 @@ namespace CrimsonEngine
             get
             {
                 Vector2 viewportCorner = ScreenToWorld(new Vector2(0, 0));
-                Vector2 viewportBottomCorner = ScreenToWorld(new Vector2(ViewportWidth, ViewportHeight));
+                Vector2 viewportBottomCorner = ScreenToWorld(SceneManager.CurrentScene.InternalResolution);
                 return new Rectangle((int)viewportCorner.X, (int)viewportCorner.Y,
                     (int)(viewportBottomCorner.X - viewportCorner.X),
                     (int)(viewportBottomCorner.Y - viewportCorner.Y));
@@ -64,11 +62,22 @@ namespace CrimsonEngine
         public Vector2 WorldToScreen(Vector2 worldPosition)
         {
             return Vector2.Transform(worldPosition, TranslationMatrix);
+            
         }
 
         public Vector2 ScreenToWorld(Vector2 screenPosition)
         {
+            if(SceneManager.CurrentScene.InternalResolution != Vector2.Zero)
+            {
+                screenPosition.X *= SceneManager.CurrentScene.InternalResolution.X / SceneManager.CurrentScene.GraphicsDevice.Viewport.Width;
+                screenPosition.Y *= SceneManager.CurrentScene.InternalResolution.Y / SceneManager.CurrentScene.GraphicsDevice.Viewport.Height;
+            }
             return Vector2.Transform(screenPosition, Matrix.Invert(TranslationMatrix));
+        }
+
+        public Vector3 WorldToScreen(Vector3 worldPosition)
+        {
+            return Vector3.Transform(worldPosition, TranslationMatrix);
         }
     }
 }

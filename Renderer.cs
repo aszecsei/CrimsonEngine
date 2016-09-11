@@ -11,6 +11,24 @@ namespace CrimsonEngine
 {
     public abstract class Renderer : Component
     {
-        public abstract void Draw(SpriteBatch spriteBatch, GameTime gameTime);
+        public virtual void DrawDiffuse(SpriteBatch spriteBatch, GameTime gameTime)
+        {
+
+        }
+
+        public virtual void DrawNormal(SpriteBatch spriteBatch, GameTime gameTime)
+        {
+
+        }
+
+        public virtual void DrawSpecular(SpriteBatch spriteBatch, GameTime gameTime)
+        {
+
+        }
+
+        public virtual void DrawEmissive(SpriteBatch spriteBatch, GameTime gameTime)
+        {
+
+        }
     }
 }

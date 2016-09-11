@@ -18,7 +18,7 @@ namespace CrimsonEngine
 
         public Vector2 Origin = Vector2.Zero;
 
-        public override void Draw(SpriteBatch spriteBatch, GameTime gameTime)
+        public override void DrawDiffuse(SpriteBatch spriteBatch, GameTime gameTime)
         {
             if(Diffuse  != null)
             {
@@ -29,6 +29,64 @@ namespace CrimsonEngine
                     origin: Origin, 
                     layerDepth: GameObject.Transform.GlobalPosition.Z,
                     scale: new Vector2(GameObject.Transform.GlobalScale.X, GameObject.Transform.GlobalScale.Y));
+            }
+            else
+            {
+                // TODO: Draw blank diffuse map
+            }
+        }
+
+        public override void DrawNormal(SpriteBatch spriteBatch, GameTime gameTime)
+        {
+            if (Normal != null)
+            {
+                spriteBatch.Draw(texture: Normal,
+                    position: new Vector2(GameObject.Transform.GlobalPosition.X, GameObject.Transform.GlobalPosition.Y),
+                    color: TintColor,
+                    rotation: GameObject.Transform.GlobalRotation,
+                    origin: Origin,
+                    layerDepth: GameObject.Transform.GlobalPosition.Z,
+                    scale: new Vector2(GameObject.Transform.GlobalScale.X, GameObject.Transform.GlobalScale.Y));
+            }
+            else
+            {
+                // TODO: Draw blank normal map
+            }
+        }
+
+        public override void DrawEmissive(SpriteBatch spriteBatch, GameTime gameTime)
+        {
+            if (Emissive != null)
+            {
+                spriteBatch.Draw(texture: Emissive,
+                    position: new Vector2(GameObject.Transform.GlobalPosition.X, GameObject.Transform.GlobalPosition.Y),
+                    color: TintColor,
+                    rotation: GameObject.Transform.GlobalRotation,
+                    origin: Origin,
+                    layerDepth: GameObject.Transform.GlobalPosition.Z,
+                    scale: new Vector2(GameObject.Transform.GlobalScale.X, GameObject.Transform.GlobalScale.Y));
+            }
+            else
+            {
+                // TODO: Draw blank emissive map
+            }
+        }
+
+        public override void DrawSpecular(SpriteBatch spriteBatch, GameTime gameTime)
+        {
+            if (Specular != null)
+            {
+                spriteBatch.Draw(texture: Specular,
+                    position: new Vector2(GameObject.Transform.GlobalPosition.X, GameObject.Transform.GlobalPosition.Y),
+                    color: TintColor,
+                    rotation: GameObject.Transform.GlobalRotation,
+                    origin: Origin,
+                    layerDepth: GameObject.Transform.GlobalPosition.Z,
+                    scale: new Vector2(GameObject.Transform.GlobalScale.X, GameObject.Transform.GlobalScale.Y));
+            }
+            else
+            {
+                // TODO: Draw blank specular map
             }
         }
     }
