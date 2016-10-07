@@ -28,7 +28,7 @@ namespace CrimsonEngine
             return AddComponent<T>(new T());
         }
 
-        public GameObject AddComponent<T>(T component) where T : Component, new()
+        public GameObject AddComponent<T>(T component) where T : Component
         {
             component.GameObject = this;
             Components[typeof(T)] = component;
@@ -108,6 +108,60 @@ namespace CrimsonEngine
             {
                 AddComponent<Transform>(value);
             }
+        }
+
+        /// <summary>
+        /// Send a message to all components of a game object. Note that this will call functions on deactivated
+        /// components, so as to enable them to awaken in response to messages.
+        /// </summary>
+        /// <param name="name">The name of the function to call.</param>
+        /// <param name="parameterArray">The parameters of the function to call.</param>
+        public void SendMessage(String name, params object[] parameterArray)
+        {
+            Type[] types = new Type[parameterArray.Length];
+            for(int i = 0; i < parameterArray.Length; i++)
+            {
+                types[0] = parameterArray[0].GetType();
+            }
+
+            foreach(Component c in Components.Values)
+            {
+                System.Reflection.MethodInfo mI = c.GetType().GetMethod(name, types);
+                if (mI != null)
+                {
+                    mI.Invoke(c, parameterArray);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Calls the method named on every component in this game object or any of its descendants.
+        /// </summary>
+        /// <param name="name">The name of the method to call.</param>
+        /// <param name="parameterArray">The parameters to pass to the method.</param>
+        public void BroadcastMessage(String name, params object[] parameterArray)
+        {
+            SendMessage(name, parameterArray);
+
+            foreach(Transform t in Transform.GetChildren())
+            {
+                t.GameObject.BroadcastMessage(name, parameterArray);
+            }
+        }
+
+        public void Destroy()
+        {
+            SceneManager.CurrentScene.DestroyGameObject(this);
+        }
+
+        public void Instantiate(GameObject go)
+        {
+            SceneManager.CurrentScene.InstantiateGameObject(go);
+        }
+
+        public GameObject Instantiate()
+        {
+            return SceneManager.CurrentScene.InstantiateGameObject();
         }
     }
 }
