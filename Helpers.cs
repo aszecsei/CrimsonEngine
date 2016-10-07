@@ -8,12 +8,17 @@ using Microsoft.Xna.Framework;
 
 namespace CrimsonEngine
 {
-    public class Helpers
+    class Helpers
     {
         public static bool IsSameOrSubclass(Type potentialBase, Type potentialDescendant)
         {
             return potentialDescendant.IsSubclassOf(potentialBase)
                    || potentialDescendant == potentialBase;
+        }
+
+        public static Vector2 rotate(Vector2 point, Vector2 origin, float rotation)
+        {
+            return new Vector2((point.X - origin.X) * (float)Math.Cos(rotation), (point.Y - origin.Y) * (float)Math.Sin(rotation));
         }
     }
 }

@@ -36,9 +36,7 @@ public Vector3 GlobalPosition
         if (Parent != null)
         {
             // rotate and scale the local position
-            // TODO: Which order is correct?
             Matrix transformationMatrix = Matrix.CreateScale(new Vector3(GlobalScale.X, GlobalScale.Y, 1)) * Matrix.CreateRotationZ(GlobalRotation);
-            // Matrix transformationMatrix = Matrix.CreateRotationZ(GlobalRotation) * Matrix.CreateScale(new Vector3(GlobalScale.X, GlobalScale.Y, 1));
             Vector3 transformedLocal = Vector3.Transform(LocalPosition, transformationMatrix);
             return transformedLocal + Parent.GlobalPosition;
         }
@@ -51,9 +49,7 @@ public Vector3 GlobalPosition
         if (Parent != null)
         {
             // rotate and scale the local position
-            // TODO: Which order is correct?
             Matrix transformationMatrix = Matrix.CreateScale(new Vector3(GlobalScale.X, GlobalScale.Y, 1)) * Matrix.CreateRotationZ(GlobalRotation);
-            // Matrix transformationMatrix = Matrix.CreateRotationZ(GlobalRotation) * Matrix.CreateScale(new Vector3(GlobalScale.X, GlobalScale.Y, 1));
             Vector3 transformedGlobal = Vector3.Transform(value, Matrix.Invert(transformationMatrix));
             LocalPosition = transformedGlobal;
             return;
@@ -63,7 +59,13 @@ public Vector3 GlobalPosition
     }
 }
 
+        /// <summary>
+        /// The rotation of the transform, in local space (in radians).
+        /// </summary>
 public float LocalRotation { get; set; }
+        /// <summary>
+        /// The rotation of the transform, in world space (in radians).
+        /// </summary>
 public float GlobalRotation
 {
     get
