@@ -10,6 +10,14 @@ namespace CrimsonEngine.Physics
 {
     public abstract class Collider : Component
     {
+        protected struct Rect
+        {
+            public Vector2 topLeft;
+            public Vector2 topRight;
+            public Vector2 bottomLeft;
+            public Vector2 bottomRight;
+        }
+
         /// <summary>
         /// The Rigidbody attached to the Collider's GameObject.
         /// </summary>
@@ -52,6 +60,9 @@ namespace CrimsonEngine.Physics
         /// <returns>Does point overlap the collider?</returns>
         public abstract bool OverlapPoint(Vector2 point);
 
+        /// <summary>
+        /// An axis-aligned bounding box (AABB) that encloses the collider.
+        /// </summary>
         public abstract Bounds Bounds();
     }
 }

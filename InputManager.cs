@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework;
 
 namespace CrimsonEngine
 {
-    class InputManager
+    public class InputManager
     {
         private GamePadState _previousGamePadState;
         private GamePadState _gamePadState;

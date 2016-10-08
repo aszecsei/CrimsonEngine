@@ -32,6 +32,7 @@ namespace CrimsonEngine
         {
             component.GameObject = this;
             Components[typeof(T)] = component;
+            (component as Component).Initialize();
             return this;
         }
 
@@ -43,11 +44,22 @@ namespace CrimsonEngine
 
         public T GetComponent<T>() where T : Component
         {
-            // TODO: Fix this so it can return subclasses of a component type?
             if (Components.ContainsKey(typeof(T)))
                 return (T)Components[typeof(T)];
             else
                 return null;
+        }
+
+        public T GetComponentOrSubclass<T>() where T : Component
+        {
+            foreach(Type t in Components.Keys)
+            {
+                if(Helpers.IsSameOrSubclass(typeof(T), t))
+                {
+                    return (T)Components[t];
+                }
+            }
+            return null;
         }
 
         public void Update(GameTime gameTime)

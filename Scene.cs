@@ -151,6 +151,23 @@ namespace CrimsonEngine
             }
         }
 
+        public List<Collider> GetAllColliders()
+        {
+            List<Collider> result = new List<Collider>();
+            foreach (GameObject go in GameObjects)
+            {
+                if(go.isActive)
+                {
+                    Collider c = go.GetComponentOrSubclass<Collider>();
+                    if(c != null && c.isActive)
+                    {
+                        result.Add(c);
+                    }
+                }
+            }
+            return result;
+        }
+
         private void DrawScene(SpriteBatch spriteBatch, GameTime gameTime)
         {
             graphicsDevice.SetRenderTarget(diffuseRenderTarget);
@@ -222,12 +239,6 @@ namespace CrimsonEngine
             graphicsDevice.SetRenderTarget(null);
 
             graphicsDevice.Clear(backgroundColor);
-
-            /*
-            spriteBatch.Begin(samplerState: SamplerState.PointClamp, blendState: maxBlend);
-            spriteBatch.Draw(depthRenderTarget, new Rectangle(0, 0, graphicsDevice.Viewport.Width, graphicsDevice.Viewport.Height), Color.White);
-            spriteBatch.End();
-            */
 
             Effect defaultLit = ResourceManager.GetResource<Effect>("Default Lit");
 
@@ -311,7 +322,12 @@ namespace CrimsonEngine
                         if(c != null)
                         {
                             Bounds b = c.Bounds();
-                            spriteBatch.Draw(pixel, new Rectangle((int)b.Left, -1 * (int)b.Top, (int)b.Size.X, (int)b.Size.Y), Color.Green);
+                            if(c.attachedRigidbody == null)
+                                spriteBatch.Draw(pixel, new Rectangle((int)b.Left, -1 * (int)b.Top, (int)b.Size.X, (int)b.Size.Y), Color.Green);
+                            else if(c.attachedRigidbody.awake)
+                                spriteBatch.Draw(pixel, new Rectangle((int)b.Left, -1 * (int)b.Top, (int)b.Size.X, (int)b.Size.Y), Color.Red);
+                            else
+                                spriteBatch.Draw(pixel, new Rectangle((int)b.Left, -1 * (int)b.Top, (int)b.Size.X, (int)b.Size.Y), Color.Blue);
                         }
                     }
                 }

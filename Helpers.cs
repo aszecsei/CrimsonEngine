@@ -21,5 +21,10 @@ namespace CrimsonEngine
             Vector2 centered = point - origin;
             return new Vector2(centered.X * (float)Math.Cos(rotation) - centered.Y * (float)Math.Sin(rotation), centered.X * (float)Math.Sin(rotation) + centered.Y * (float)Math.Cos(rotation)) + origin;
         }
+
+        public static Vector2 extractFromVector3(Vector3 vec3)
+        {
+            return new Vector2(vec3.X, vec3.Y);
+        }
     }
 }

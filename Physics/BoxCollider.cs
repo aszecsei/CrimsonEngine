@@ -10,14 +10,6 @@ namespace CrimsonEngine.Physics
 {
     public class BoxCollider : Collider
     {
-        protected struct Rect
-        {
-            public Vector2 topLeft;
-            public Vector2 topRight;
-            public Vector2 bottomLeft;
-            public Vector2 bottomRight;
-        }
-
         public Vector2 size = Vector2.One;
 
         protected Rect rotated
@@ -80,7 +72,7 @@ namespace CrimsonEngine.Physics
                 return new Bounds(left, top, right, bottom);
         }
 
-        public new List<Vector2> Normals
+        public List<Vector2> Normals
         {
             get
             {
@@ -96,6 +88,11 @@ namespace CrimsonEngine.Physics
             }
         }
 
+        /// <summary>
+        /// Checks whether this collider is touching the collider or not.
+        /// </summary>
+        /// <param name="collider">The collider to check if it is touching this collider.</param>
+        /// <returns>Whether the collider is touching this collider or not.</returns>
         public override bool IsTouching(Collider collider)
         {
             // First, check if the bounds are touching. This is computationally easy, so if we don't need to do anything else,
@@ -172,22 +169,78 @@ namespace CrimsonEngine.Physics
 
                 return true;
             }
+            else if(collider is CircleCollider)
+            {
+                // TODO: Implement this.
+                throw new NotImplementedException();
+            }
             else
             {
                 throw new NotImplementedException();
             }
         }
 
+        /// <summary>
+        /// Checks whether this collider is touching any collider on the specified layerMask or not.
+        /// </summary>
+        /// <param name="layerMask">Any colliders on any of these layers count as touching.</param>
+        /// <returns>Whether this collider is touching any colliders on the specified layerMask or not.</returns>
         public override bool IsTouchingLayers(int layerMask)
         {
             // TODO: Implement this.
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Check if a collider overlaps a point in space.
+        /// </summary>
+        /// <param name="point">A point in world space.</param>
+        /// <returns>Does point overlap the collider?</returns>
         public override bool OverlapPoint(Vector2 point)
         {
-            // TODO: Implement this.
-            throw new NotImplementedException();
+            Bounds b = Bounds();
+            if (b.Left > point.X || b.Right < point.X || b.Top < point.Y || b.Bottom > point.Y)
+                return false;
+
+            // Perform SAT-flavored collision detection.
+            List<Vector2> normals = Normals;
+
+            Rect mRect = rotatedGlobal;
+
+            Vector2[] mPoints = new Vector2[4] { mRect.topLeft, mRect.topRight, mRect.bottomRight, mRect.bottomLeft };
+
+            foreach (Vector2 axis in normals)
+            {
+                // Obtain the min-max projection on this
+                float min_proj_this = Vector2.Dot(mPoints[0], axis);
+                int min_dot_this = 0;
+                float max_proj_this = Vector2.Dot(mPoints[0], axis);
+                int max_dot_this = 0;
+
+                for (int i = 1; i < mPoints.Length; i++)
+                {
+                    float curr_proj = Vector2.Dot(mPoints[i], axis);
+                    if (min_proj_this > curr_proj)
+                    {
+                        min_proj_this = curr_proj;
+                        min_dot_this = i;
+                    }
+                    if (curr_proj > max_proj_this)
+                    {
+                        max_proj_this = curr_proj;
+                        max_dot_this = i;
+                    }
+                }
+
+                // Obtain the min-max projection on other
+                float proj = Vector2.Dot(point, axis);
+
+                bool isSeparated = proj < min_proj_this || max_proj_this < proj;
+                if (isSeparated)
+                    return false;
+            }
+
+            return true;
         }
     }
 }

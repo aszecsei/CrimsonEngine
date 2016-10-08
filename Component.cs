@@ -16,6 +16,16 @@ namespace CrimsonEngine
         /// </summary>
         public bool isActive = true;
 
+        /// <summary>
+        /// This method is called after the game object has been set and the component's
+        /// values have been initialized.
+        /// </summary>
+        public virtual void Initialize() { }
+
+        /// <summary>
+        /// This method is called every tick to update game logic.
+        /// </summary>
+        /// <param name="gameTime">The amount of time since the last method call.</param>
         public virtual void Update(GameTime gameTime) { }
 
         /// <summary>
@@ -42,7 +52,7 @@ namespace CrimsonEngine
         /// <typeparam name="U">The component subclass to instantiate.</typeparam>
         public void Requires<T, U>() where T : Component where U : T, new()
         {
-            if (GameObject.GetComponent<T>() == null)
+            if (GameObject.GetComponentOrSubclass<T>() == null)
             {
                 GameObject.AddComponent<U>();
             }
