@@ -23,7 +23,7 @@ namespace CrimsonEngine
             if(Diffuse  != null)
             {
                 spriteBatch.Draw(texture: Diffuse, 
-                    position: new Vector2(GameObject.Transform.GlobalPosition.X, GameObject.Transform.GlobalPosition.Y), 
+                    position: new Vector2(GameObject.Transform.GlobalPosition.X, -GameObject.Transform.GlobalPosition.Y), 
                     color: TintColor, 
                     rotation: GameObject.Transform.GlobalRotation, 
                     origin: Origin, 
@@ -41,7 +41,7 @@ namespace CrimsonEngine
             if (Normal != null)
             {
                 spriteBatch.Draw(texture: Normal,
-                    position: new Vector2(GameObject.Transform.GlobalPosition.X, GameObject.Transform.GlobalPosition.Y),
+                    position: new Vector2(GameObject.Transform.GlobalPosition.X, -GameObject.Transform.GlobalPosition.Y),
                     color: TintColor,
                     rotation: GameObject.Transform.GlobalRotation,
                     origin: Origin,
@@ -59,7 +59,7 @@ namespace CrimsonEngine
             if (Emissive != null)
             {
                 spriteBatch.Draw(texture: Emissive,
-                    position: new Vector2(GameObject.Transform.GlobalPosition.X, GameObject.Transform.GlobalPosition.Y),
+                    position: new Vector2(GameObject.Transform.GlobalPosition.X, -GameObject.Transform.GlobalPosition.Y),
                     color: TintColor,
                     rotation: GameObject.Transform.GlobalRotation,
                     origin: Origin,
@@ -77,7 +77,7 @@ namespace CrimsonEngine
             if (Specular != null)
             {
                 spriteBatch.Draw(texture: Specular,
-                    position: new Vector2(GameObject.Transform.GlobalPosition.X, GameObject.Transform.GlobalPosition.Y),
+                    position: new Vector2(GameObject.Transform.GlobalPosition.X, -GameObject.Transform.GlobalPosition.Y),
                     color: TintColor,
                     rotation: GameObject.Transform.GlobalRotation,
                     origin: Origin,

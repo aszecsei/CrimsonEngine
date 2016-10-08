@@ -18,7 +18,8 @@ namespace CrimsonEngine
 
         public static Vector2 rotate(Vector2 point, Vector2 origin, float rotation)
         {
-            return new Vector2((point.X - origin.X) * (float)Math.Cos(rotation), (point.Y - origin.Y) * (float)Math.Sin(rotation));
+            Vector2 centered = point - origin;
+            return new Vector2(centered.X * (float)Math.Cos(rotation) - centered.Y * (float)Math.Sin(rotation), centered.X * (float)Math.Sin(rotation) + centered.Y * (float)Math.Cos(rotation)) + origin;
         }
     }
 }

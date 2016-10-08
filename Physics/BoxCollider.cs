@@ -10,15 +10,22 @@ namespace CrimsonEngine.Physics
 {
     public class BoxCollider : Collider
     {
-        public Vector2 size;
+        protected struct Rect
+        {
+            public Vector2 topLeft;
+            public Vector2 topRight;
+            public Vector2 bottomLeft;
+            public Vector2 bottomRight;
+        }
 
-        /// <summary>
-        /// An axis-aligned bounding box (AABB) that encloses the collider.
-        /// </summary>
-        new public Bounds Bounds
+        public Vector2 size = Vector2.One;
+
+        protected Rect rotated
         {
             get
             {
+                Rect result = new Rect();
+
                 // Calculate the positions of all 4 corners of the box after all rotation is applied
                 float left = offset.X - (size.X / 2);
                 float right = offset.X + (size.X / 2);
@@ -29,41 +36,140 @@ namespace CrimsonEngine.Physics
                 Vector2 bottomLeft = new Vector2(left, bottom);
                 Vector2 bottomRight = new Vector2(right, bottom);
 
-                topLeft = Helpers.rotate(topLeft, Vector2.Zero, GameObject.Transform.GlobalRotation);
-                topRight = Helpers.rotate(topRight, Vector2.Zero, GameObject.Transform.GlobalRotation);
-                bottomLeft = Helpers.rotate(bottomLeft, Vector2.Zero, GameObject.Transform.GlobalRotation);
-                bottomRight = Helpers.rotate(bottomRight, Vector2.Zero, GameObject.Transform.GlobalRotation);
+                result.topLeft = Helpers.rotate(topLeft, Vector2.Zero, GameObject.Transform.GlobalRotation);
+                result.topRight = Helpers.rotate(topRight, Vector2.Zero, GameObject.Transform.GlobalRotation);
+                result.bottomLeft = Helpers.rotate(bottomLeft, Vector2.Zero, GameObject.Transform.GlobalRotation);
+                result.bottomRight = Helpers.rotate(bottomRight, Vector2.Zero, GameObject.Transform.GlobalRotation);
+
+                return result;
+            }
+        }
+
+        protected Rect rotatedGlobal
+        {
+            get
+            {
+                Rect result = rotated;
+
+                Vector3 gp = GameObject.Transform.GlobalPosition;
+                Vector2 gp2 = new Vector2(gp.X, gp.Y);
+                result.bottomLeft += gp2;
+                result.bottomRight += gp2;
+                result.topLeft += gp2;
+                result.topRight += gp2;
+
+                return result;
+            }
+        }
+
+        /// <summary>
+        /// An axis-aligned bounding box (AABB) that encloses the collider.
+        /// </summary>
+        public override Bounds Bounds()
+        {
+                Rect rot = rotated;
 
                 // Those 4 corners are going to have the minimum/maximum bounds for any rotation, and will define our new
                 // AABB.
                 Vector3 gp = GameObject.Transform.GlobalPosition;
-                left = Math.Min(Math.Min(Math.Min(topLeft.X, topRight.X), bottomLeft.X), bottomRight.X) + gp.X;
-                right = Math.Max(Math.Max(Math.Max(topLeft.X, topRight.X), bottomLeft.X), bottomRight.X) + gp.X;
-                bottom = Math.Min(Math.Min(Math.Min(topLeft.Y, topRight.Y), bottomLeft.Y), bottomRight.Y) + gp.Y;
-                top = Math.Max(Math.Max(Math.Max(topLeft.Y, topRight.Y), bottomLeft.Y), bottomRight.Y) + gp.Y;
+                float left = Math.Min(Math.Min(Math.Min(rot.topLeft.X, rot.topRight.X), rot.bottomLeft.X), rot.bottomRight.X) + gp.X;
+                float right = Math.Max(Math.Max(Math.Max(rot.topLeft.X, rot.topRight.X), rot.bottomLeft.X), rot.bottomRight.X) + gp.X;
+                float bottom = Math.Min(Math.Min(Math.Min(rot.topLeft.Y, rot.topRight.Y), rot.bottomLeft.Y), rot.bottomRight.Y) + gp.Y;
+                float top = Math.Max(Math.Max(Math.Max(rot.topLeft.Y, rot.topRight.Y), rot.bottomLeft.Y), rot.bottomRight.Y) + gp.Y;
 
                 return new Bounds(left, top, right, bottom);
-            }
         }
 
-        
+        public new List<Vector2> Normals
+        {
+            get
+            {
+                List<Vector2> result = new List<Vector2>();
+
+                Rect rot = rotated;
+
+                Vector2 left = new Vector2(-1, 1);
+                result.Add((rot.topLeft - rot.bottomLeft) * left);
+                result.Add((rot.bottomLeft - rot.bottomRight) * left);
+
+                return result;
+            }
+        }
 
         public override bool IsTouching(Collider collider)
         {
             // First, check if the bounds are touching. This is computationally easy, so if we don't need to do anything else,
             // why bother?
-            Bounds mBounds = this.Bounds;
-            Bounds oBounds = collider.Bounds;
-            if(!mBounds.CollidesWith(oBounds))
+            Bounds mBounds = this.Bounds();
+            Bounds oBounds = collider.Bounds();
+            if (!mBounds.CollidesWith(oBounds))
             {
                 return false;
             }
 
-            // If the bounds are colliding, we should do more interesting calculations to detect collision.
-            if(collider is BoxCollider)
+            if (collider is BoxCollider)
             {
-                // TODO: Perform SAT-flavored collision detection.
-                // For now, just return true.
+                // Perform SAT-flavored collision detection.
+                BoxCollider bc = collider as BoxCollider;
+
+                List<Vector2> normals = Normals;
+                normals.AddRange(bc.Normals);
+
+                Rect mRect = rotatedGlobal;
+                Rect oRect = bc.rotatedGlobal;
+
+                Vector2[] mPoints = new Vector2[4] { mRect.topLeft, mRect.topRight, mRect.bottomRight, mRect.bottomLeft };
+                Vector2[] oPoints = new Vector2[4] { oRect.topLeft, oRect.topRight, oRect.bottomRight, oRect.bottomLeft };
+
+                foreach (Vector2 axis in normals)
+                {
+                    // Obtain the min-max projection on this
+                    float min_proj_this = Vector2.Dot(mPoints[0], axis);
+                    int min_dot_this = 0;
+                    float max_proj_this = Vector2.Dot(mPoints[0], axis);
+                    int max_dot_this = 0;
+
+                    for(int i=1; i<mPoints.Length; i++)
+                    {
+                        float curr_proj = Vector2.Dot(mPoints[i], axis);
+                        if(min_proj_this > curr_proj)
+                        {
+                            min_proj_this = curr_proj;
+                            min_dot_this = i;
+                        }
+                        if(curr_proj > max_proj_this)
+                        {
+                            max_proj_this = curr_proj;
+                            max_dot_this = i;
+                        }
+                    }
+
+                    // Obtain the min-max projection on other
+                    float min_proj_other = Vector2.Dot(oPoints[0], axis);
+                    int min_dot_other = 0;
+                    float max_proj_other = Vector2.Dot(oPoints[0], axis);
+                    int max_dot_other = 0;
+
+                    for (int i = 1; i < oPoints.Length; i++)
+                    {
+                        float curr_proj = Vector2.Dot(oPoints[i], axis);
+                        if (min_proj_other > curr_proj)
+                        {
+                            min_proj_other = curr_proj;
+                            min_dot_other = i;
+                        }
+                        if (curr_proj > max_proj_other)
+                        {
+                            max_proj_other = curr_proj;
+                            max_dot_other = i;
+                        }
+                    }
+
+                    bool isSeparated = max_proj_other < min_proj_this || max_proj_this < min_proj_other;
+                    if (isSeparated)
+                        return false;
+                }
+
                 return true;
             }
             else

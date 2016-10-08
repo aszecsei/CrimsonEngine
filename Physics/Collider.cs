@@ -52,6 +52,6 @@ namespace CrimsonEngine.Physics
         /// <returns>Does point overlap the collider?</returns>
         public abstract bool OverlapPoint(Vector2 point);
 
-        public Bounds Bounds;
+        public abstract Bounds Bounds();
     }
 }

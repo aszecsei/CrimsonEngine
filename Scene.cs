@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 
 using Microsoft.Xna.Framework.Input;
 
+using CrimsonEngine.Physics;
+
 namespace CrimsonEngine
 {
     public class Scene
@@ -17,6 +19,7 @@ namespace CrimsonEngine
         public List<GameObject> GameObjects;
 
         public bool shouldDrawFrameRate = false;
+        public bool shouldDrawPhysicsBounds = false;
 
         private float averageFramesPerSecond;
         private float currentFramesPerSecond;
@@ -293,6 +296,25 @@ namespace CrimsonEngine
                     spriteBatch.Draw(whiteRectangle, new Rectangle(0, graphicsDevice.Viewport.Height - difference, graphicsDevice.Viewport.Width, difference), Color.Black);
                 }
 
+                spriteBatch.End();
+            }
+
+            if (shouldDrawPhysicsBounds)
+            {
+                Texture2D pixel = ResourceManager.GetResource<Texture2D>("Pixel");
+                spriteBatch.Begin(transformMatrix: Camera2D.main.TranslationMatrix, samplerState: SamplerState.PointClamp);
+                foreach(GameObject go in SceneManager.CurrentScene.GameObjects)
+                {
+                    if(go.isActive)
+                    {
+                        Collider c = go.GetComponent<BoxCollider>();
+                        if(c != null)
+                        {
+                            Bounds b = c.Bounds();
+                            spriteBatch.Draw(pixel, new Rectangle((int)b.Left, -1 * (int)b.Top, (int)b.Size.X, (int)b.Size.Y), Color.Green);
+                        }
+                    }
+                }
                 spriteBatch.End();
             }
 

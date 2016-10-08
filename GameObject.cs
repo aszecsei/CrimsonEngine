@@ -43,6 +43,7 @@ namespace CrimsonEngine
 
         public T GetComponent<T>() where T : Component
         {
+            // TODO: Fix this so it can return subclasses of a component type?
             if (Components.ContainsKey(typeof(T)))
                 return (T)Components[typeof(T)];
             else
