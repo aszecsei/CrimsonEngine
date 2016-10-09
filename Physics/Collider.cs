@@ -64,5 +64,12 @@ namespace CrimsonEngine.Physics
         /// An axis-aligned bounding box (AABB) that encloses the collider.
         /// </summary>
         public abstract Bounds Bounds();
+
+        public override void Initialize()
+        {
+            base.Initialize();
+
+            SceneManager.CurrentScene.PhysicsObjects.Add(GameObject);
+        }
     }
 }

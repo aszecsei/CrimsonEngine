@@ -17,9 +17,9 @@ namespace CrimsonEngine
         public Color backgroundColor = Color.CornflowerBlue;
 
         public List<GameObject> GameObjects;
+        public List<GameObject> PhysicsObjects;
 
         public bool shouldDrawFrameRate = false;
-        public bool shouldDrawPhysicsBounds = false;
 
         private float averageFramesPerSecond;
         private float currentFramesPerSecond;
@@ -66,6 +66,7 @@ namespace CrimsonEngine
         {
             this.graphicsDevice = graphicsDevice;
             GameObjects = new List<GameObject>();
+            PhysicsObjects = new List<GameObject>();
             _internalResolution = internalResolution;
 
             diffuseRenderTarget = new RenderTarget2D(graphicsDevice, (int)internalResolution.X, (int)internalResolution.Y);
@@ -172,7 +173,7 @@ namespace CrimsonEngine
         public List<Collider> GetAllColliders()
         {
             List<Collider> result = new List<Collider>();
-            foreach (GameObject go in GameObjects)
+            foreach (GameObject go in PhysicsObjects)
             {
                 if(go.isActive)
                 {
@@ -343,33 +344,7 @@ namespace CrimsonEngine
                 spriteBatch.End();
             }
 
-            if (shouldDrawPhysicsBounds)
-            {
-                Texture2D pixel = ResourceManager.GetResource<Texture2D>("Pixel");
-                spriteBatch.Begin(transformMatrix:Camera2D.main.TranslationMatrix, samplerState: SamplerState.PointClamp);
-                foreach(GameObject go in SceneManager.CurrentScene.GameObjects)
-                {
-                    if(go.isActive)
-                    {
-                        Collider c = go.GetComponent<BoxCollider>();
-                        if(c != null)
-                        {
-                            Bounds b = c.Bounds();
-                            Vector2 dTL = Vector2.Transform(new Vector2(b.Left, -1 * b.Top), Camera2D.main.TranslationMatrix);
-                            Vector2 dBR = Vector2.Transform(new Vector2(b.Right, -1 * b.Bottom), Camera2D.main.TranslationMatrix);
-                            Vector2 dSize = dBR - dTL;
-                            Rectangle dest = new Rectangle(dTL.ToPoint(), dSize.ToPoint());
-                            if (c.attachedRigidbody == null)
-                                spriteBatch.Draw(pixel, dest, Color.Green);
-                            else if(c.attachedRigidbody.awake)
-                                spriteBatch.Draw(pixel, dest, Color.Red);
-                            else
-                                spriteBatch.Draw(pixel, dest, Color.Blue);
-                        }
-                    }
-                }
-                spriteBatch.End();
-            }
+            Debug.Draw(spriteBatch, gameTime);
 
             if (shouldDrawFrameRate)
             {

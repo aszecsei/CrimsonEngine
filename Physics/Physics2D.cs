@@ -8,8 +8,10 @@ using Microsoft.Xna.Framework;
 
 namespace CrimsonEngine.Physics
 {
-    class Physics2D
+    public static class Physics2D
     {
-        public static Vector2 Gravity = new Vector2(0, -0.5f);
+        public static Vector2 Gravity = new Vector2(0, -0.9f);
+
+        public static bool drawDebugPhysics = true;
     }
 }

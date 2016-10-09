@@ -66,5 +66,14 @@ namespace CrimsonEngine.Physics
         {
             return new Bounds(offset + Helpers.extractFromVector3(GameObject.Transform.GlobalPosition), new Vector2(radius));
         }
+
+        public override void Update(GameTime gameTime)
+        {
+            base.Update(gameTime);
+            if (Physics2D.drawDebugPhysics)
+            {
+                Debug.DrawDebugCircle(offset + Helpers.extractFromVector3(GameObject.Transform.GlobalPosition), radius, Color.Green, 1);
+            }
+        }
     }
 }
