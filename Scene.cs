@@ -149,6 +149,24 @@ namespace CrimsonEngine
                     go.Update(gameTime);
                 }
             }
+
+            // Insertion-sort the GameObject list
+            // Since teleportation in the z-direction is rare!
+            // So the sorting is often nearly-sorted.
+            GameObject temp = null;
+            for(int i=1; i<GameObjects.Count; i++)
+            {
+                int j = i;
+
+                while((j > 0) && (GameObjects[j].Transform.GlobalPosition.Z > GameObjects[j - 1].Transform.GlobalPosition.Z))
+                {
+                    int k = j - 1;
+                    temp = GameObjects[k];
+                    GameObjects[k] = GameObjects[j];
+                    GameObjects[j] = temp;
+                    j--;
+                }
+            }
         }
 
         public List<Collider> GetAllColliders()
@@ -168,6 +186,11 @@ namespace CrimsonEngine
             return result;
         }
 
+        private bool shouldDraw(GameObject go)
+        {
+            return go.isActive && (go.Transform.GlobalPosition.Z > Camera2D.main.Transform.GlobalPosition.Z);
+        }
+
         private void DrawScene(SpriteBatch spriteBatch, GameTime gameTime)
         {
             graphicsDevice.SetRenderTarget(diffuseRenderTarget);
@@ -178,7 +201,7 @@ namespace CrimsonEngine
 
             foreach (GameObject go in GameObjects)
             {
-                if (go.isActive)
+                if (shouldDraw(go))
                 {
                     go.DrawDiffuse(spriteBatch, gameTime);
                 }
@@ -194,7 +217,7 @@ namespace CrimsonEngine
 
             foreach (GameObject go in GameObjects)
             {
-                if (go.isActive)
+                if (shouldDraw(go))
                 {
                     go.DrawNormal(spriteBatch, gameTime);
                 }
@@ -203,33 +226,31 @@ namespace CrimsonEngine
             spriteBatch.End();
 
             graphicsDevice.SetRenderTarget(depthRenderTarget);
-            graphicsDevice.Clear(Color.Black);
+            graphicsDevice.Clear(Color.White);
 
             // first, find the total depth range of the thing
-            float minDepth = 0.0f;
-            float maxDepth = 0.0f;
-            foreach (GameObject go in GameObjects)
-            {
-                if (go.isActive)
-                {
-                    if (go.Transform.GlobalPosition.Z * Camera2D.main.Zoom < minDepth)
-                        minDepth = go.Transform.GlobalPosition.Z * Camera2D.main.Zoom;
-                    if (go.Transform.GlobalPosition.Z * Camera2D.main.Zoom > maxDepth)
-                        maxDepth = go.Transform.GlobalPosition.Z * Camera2D.main.Zoom;
-                }
-            }
+            float minDepth = Camera2D.main.Transform.GlobalPosition.Z;
+            float maxDepth = GameObjects[0].Transform.GlobalPosition.Z;
             float depthRange = maxDepth - minDepth;
             if (depthRange == 0)
                 depthRange = 1;
 
             // using this, we can calculate a float from 0-1 representing the depth of a game object
             Effect depthMap = ResourceManager.GetResource<Effect>("DepthMap");
-            spriteBatch.Begin(effect: depthMap, transformMatrix: Camera2D.main.TranslationMatrix, samplerState: SamplerState.PointClamp);
+            spriteBatch.Begin(effect: depthMap, transformMatrix: Camera2D.main.TranslationMatrix, samplerState: SamplerState.PointClamp, blendState:BlendState.AlphaBlend, sortMode:SpriteSortMode.BackToFront);
+            float currentDepth = minDepth;
             foreach (GameObject go in GameObjects)
             {
-                if(go.isActive)
+                if(shouldDraw(go))
                 {
-                    depthMap.Parameters["depth"].SetValue(1 - ((((go.Transform.GlobalPosition.Z * Camera2D.main.Zoom) - minDepth) / depthRange) * 0.8f));
+                    if(currentDepth != go.Transform.GlobalPosition.Z)
+                    {
+                        currentDepth = go.Transform.GlobalPosition.Z;
+                        spriteBatch.End();
+                        spriteBatch.Begin(effect: depthMap, transformMatrix: Camera2D.main.TranslationMatrix, samplerState: SamplerState.PointClamp, blendState: BlendState.AlphaBlend, sortMode: SpriteSortMode.BackToFront);
+                    }
+                    float depthValue = (((go.Transform.GlobalPosition.Z - minDepth) / depthRange) * 0.8f);
+                    depthMap.Parameters["depth"].SetValue(depthValue);
                     depthMap.CurrentTechnique.Passes[0].Apply();
                     go.DrawDiffuse(spriteBatch, gameTime);
                 }
@@ -238,7 +259,13 @@ namespace CrimsonEngine
 
             graphicsDevice.SetRenderTarget(null);
 
-            graphicsDevice.Clear(backgroundColor);
+            graphicsDevice.Clear(Color.Black);
+
+            /*
+            spriteBatch.Begin(samplerState: SamplerState.PointClamp);
+            spriteBatch.Draw(depthRenderTarget, new Rectangle(0, 0, graphicsDevice.Viewport.Width, graphicsDevice.Viewport.Height), Color.White);
+            spriteBatch.End();
+            */
 
             Effect defaultLit = ResourceManager.GetResource<Effect>("Default Lit");
 
@@ -254,9 +281,11 @@ namespace CrimsonEngine
                         defaultLit.Parameters["DepthMap"].SetValue(depthRenderTarget);
                         defaultLit.Parameters["MinDepth"].SetValue(minDepth);
                         defaultLit.Parameters["DepthRange"].SetValue(depthRange);
-                        defaultLit.Parameters["DiffuseLightDirection"].SetValue(new Vector3((float)Math.Cos(gameTime.TotalGameTime.TotalSeconds), (float)Math.Sin(gameTime.TotalGameTime.TotalSeconds), 1));
-                        defaultLit.Parameters["DiffuseIntensity"].SetValue(0.0f);
-                        defaultLit.Parameters["LightLocationScreen"].SetValue(Camera2D.main.WorldToScreen(go.Transform.GlobalPosition));
+                        defaultLit.Parameters["DiffuseLightDirection"].SetValue(new Vector3((float)Math.Cos(gameTime.TotalGameTime.TotalSeconds), (float)Math.Sin(gameTime.TotalGameTime.TotalSeconds), 15));
+                        defaultLit.Parameters["DiffuseIntensity"].SetValue(0f);
+                        Vector3 lightScreenLoc = Camera2D.main.WorldToScreen(go.Transform.GlobalPosition);
+                        lightScreenLoc.Z = go.Transform.GlobalPosition.Z;
+                        defaultLit.Parameters["LightLocationScreen"].SetValue(lightScreenLoc);
                         defaultLit.Parameters["LightColor"].SetValue(l.Color.ToVector4());
                         defaultLit.Parameters["LightIntensity"].SetValue(l.Intensity);
                         defaultLit.Parameters["LightRange"].SetValue(l.Range * Camera2D.main.Zoom);
@@ -265,6 +294,7 @@ namespace CrimsonEngine
                         defaultLit.Parameters["LightRotation"].SetValue(l.Rotation / 180f * (float)Math.PI);
                         defaultLit.Parameters["LightConeAngle"].SetValue(l.ConeAngle / 180f * (float)Math.PI);
                         defaultLit.Parameters["LightPenumbraAngle"].SetValue(l.PenumbraAngle / 180f * (float)Math.PI);
+                        defaultLit.Parameters["BackgroundColor"].SetValue(backgroundColor.ToVector4());
                         
                         defaultLit.CurrentTechnique.Passes[0].Apply();
                         spriteBatch.Draw(diffuseRenderTarget, new Rectangle(0, 0, graphicsDevice.Viewport.Width, graphicsDevice.Viewport.Height), Color.White);
@@ -313,7 +343,7 @@ namespace CrimsonEngine
             if (shouldDrawPhysicsBounds)
             {
                 Texture2D pixel = ResourceManager.GetResource<Texture2D>("Pixel");
-                spriteBatch.Begin(transformMatrix: Camera2D.main.TranslationMatrix, samplerState: SamplerState.PointClamp);
+                spriteBatch.Begin(transformMatrix:Camera2D.main.TranslationMatrix, samplerState: SamplerState.PointClamp);
                 foreach(GameObject go in SceneManager.CurrentScene.GameObjects)
                 {
                     if(go.isActive)
@@ -322,12 +352,16 @@ namespace CrimsonEngine
                         if(c != null)
                         {
                             Bounds b = c.Bounds();
-                            if(c.attachedRigidbody == null)
-                                spriteBatch.Draw(pixel, new Rectangle((int)b.Left, -1 * (int)b.Top, (int)b.Size.X, (int)b.Size.Y), Color.Green);
+                            Vector2 dTL = Vector2.Transform(new Vector2(b.Left, -1 * b.Top), Camera2D.main.TranslationMatrix);
+                            Vector2 dBR = Vector2.Transform(new Vector2(b.Right, -1 * b.Bottom), Camera2D.main.TranslationMatrix);
+                            Vector2 dSize = dBR - dTL;
+                            Rectangle dest = new Rectangle(dTL.ToPoint(), dSize.ToPoint());
+                            if (c.attachedRigidbody == null)
+                                spriteBatch.Draw(pixel, dest, Color.Green);
                             else if(c.attachedRigidbody.awake)
-                                spriteBatch.Draw(pixel, new Rectangle((int)b.Left, -1 * (int)b.Top, (int)b.Size.X, (int)b.Size.Y), Color.Red);
+                                spriteBatch.Draw(pixel, dest, Color.Red);
                             else
-                                spriteBatch.Draw(pixel, new Rectangle((int)b.Left, -1 * (int)b.Top, (int)b.Size.X, (int)b.Size.Y), Color.Blue);
+                                spriteBatch.Draw(pixel, dest, Color.Blue);
                         }
                     }
                 }
