@@ -27,7 +27,6 @@ namespace CrimsonEngine
                     color: TintColor, 
                     rotation: GameObject.Transform.GlobalRotation, 
                     origin: Origin, 
-                    layerDepth: GameObject.Transform.GlobalPosition.Z,
                     scale: new Vector2(GameObject.Transform.GlobalScale.X, GameObject.Transform.GlobalScale.Y));
             }
             else
@@ -45,7 +44,6 @@ namespace CrimsonEngine
                     color: TintColor,
                     rotation: GameObject.Transform.GlobalRotation,
                     origin: Origin,
-                    layerDepth: GameObject.Transform.GlobalPosition.Z,
                     scale: new Vector2(GameObject.Transform.GlobalScale.X, GameObject.Transform.GlobalScale.Y));
             }
             else
@@ -63,7 +61,6 @@ namespace CrimsonEngine
                     color: TintColor,
                     rotation: GameObject.Transform.GlobalRotation,
                     origin: Origin,
-                    layerDepth: GameObject.Transform.GlobalPosition.Z,
                     scale: new Vector2(GameObject.Transform.GlobalScale.X, GameObject.Transform.GlobalScale.Y));
             }
             else
@@ -81,7 +78,6 @@ namespace CrimsonEngine
                     color: TintColor,
                     rotation: GameObject.Transform.GlobalRotation,
                     origin: Origin,
-                    layerDepth: GameObject.Transform.GlobalPosition.Z,
                     scale: new Vector2(GameObject.Transform.GlobalScale.X, GameObject.Transform.GlobalScale.Y));
             }
             else

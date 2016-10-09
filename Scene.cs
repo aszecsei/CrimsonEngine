@@ -188,7 +188,7 @@ namespace CrimsonEngine
 
         private bool shouldDraw(GameObject go)
         {
-            return go.isActive && (go.Transform.GlobalPosition.Z > Camera2D.main.Transform.GlobalPosition.Z);
+            return go.isActive && (go.Transform.GlobalPosition.Z >= Camera2D.main.Transform.GlobalPosition.Z);
         }
 
         private void DrawScene(SpriteBatch spriteBatch, GameTime gameTime)
@@ -263,10 +263,10 @@ namespace CrimsonEngine
 
             /*
             spriteBatch.Begin(samplerState: SamplerState.PointClamp);
-            spriteBatch.Draw(depthRenderTarget, new Rectangle(0, 0, graphicsDevice.Viewport.Width, graphicsDevice.Viewport.Height), Color.White);
+            spriteBatch.Draw(diffuseRenderTarget, new Rectangle(0, 0, graphicsDevice.Viewport.Width, graphicsDevice.Viewport.Height), Color.White);
             spriteBatch.End();
             */
-
+            
             Effect defaultLit = ResourceManager.GetResource<Effect>("Default Lit");
 
             foreach (GameObject go in GameObjects)
@@ -283,7 +283,9 @@ namespace CrimsonEngine
                         defaultLit.Parameters["DepthRange"].SetValue(depthRange);
                         defaultLit.Parameters["DiffuseLightDirection"].SetValue(new Vector3((float)Math.Cos(gameTime.TotalGameTime.TotalSeconds), (float)Math.Sin(gameTime.TotalGameTime.TotalSeconds), 15));
                         defaultLit.Parameters["DiffuseIntensity"].SetValue(0f);
-                        Vector3 lightScreenLoc = Camera2D.main.WorldToScreen(go.Transform.GlobalPosition);
+                        Vector3 lightScreenLoc = go.Transform.GlobalPosition;
+                        lightScreenLoc.Y *= -1;
+                        lightScreenLoc = Camera2D.main.WorldToScreen(lightScreenLoc);
                         lightScreenLoc.Z = go.Transform.GlobalPosition.Z;
                         defaultLit.Parameters["LightLocationScreen"].SetValue(lightScreenLoc);
                         defaultLit.Parameters["LightColor"].SetValue(l.Color.ToVector4());
@@ -291,7 +293,7 @@ namespace CrimsonEngine
                         defaultLit.Parameters["LightRange"].SetValue(l.Range * Camera2D.main.Zoom);
 
                         defaultLit.Parameters["LightLength"].SetValue(l.Length * Camera2D.main.Zoom);
-                        defaultLit.Parameters["LightRotation"].SetValue(l.Rotation / 180f * (float)Math.PI);
+                        defaultLit.Parameters["LightRotation"].SetValue((l.Rotation + 180) / 180f * (float)Math.PI);
                         defaultLit.Parameters["LightConeAngle"].SetValue(l.ConeAngle / 180f * (float)Math.PI);
                         defaultLit.Parameters["LightPenumbraAngle"].SetValue(l.PenumbraAngle / 180f * (float)Math.PI);
                         defaultLit.Parameters["BackgroundColor"].SetValue(backgroundColor.ToVector4());
@@ -302,6 +304,7 @@ namespace CrimsonEngine
                     }
                 }
             }
+            
         }
 
         public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
