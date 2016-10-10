@@ -243,9 +243,9 @@ namespace CrimsonEngine.Physics
             return true;
         }
 
-        public override void Update(GameTime gameTime)
+        public override void Update()
         {
-            base.Update(gameTime);
+            base.Update();
             if (Physics2D.drawDebugPhysics)
             {
                 Color c = Color.Green;

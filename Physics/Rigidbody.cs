@@ -34,9 +34,9 @@ namespace CrimsonEngine.Physics
             awake = true;
         }
 
-        public override void Update(GameTime gameTime)
+        public override void FixedUpdate()
         {
-            base.Update(gameTime);
+            base.Update();
 
             if(Velocity.LengthSquared() >= (awakeThreshold * awakeThreshold))
             {
@@ -50,7 +50,7 @@ namespace CrimsonEngine.Physics
                     Velocity += (Physics2D.Gravity * gravity);
                 }
 
-                Vector2 vel = Velocity * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                Vector2 vel = Velocity * (float)Time.deltaTime;
 
                 Vector2 gravityProjection = Physics2D.Gravity * (Vector2.Dot(vel, Physics2D.Gravity) / Vector2.Dot(Physics2D.Gravity, Physics2D.Gravity));
                 Vector3 oldPos = new Vector3(GameObject.Transform.GlobalPosition.X, GameObject.Transform.GlobalPosition.Y, GameObject.Transform.GlobalPosition.Z);
@@ -94,9 +94,9 @@ namespace CrimsonEngine.Physics
                             c.attachedRigidbody.awake = true;
 
                             // Transfer of momentum!
-                            c.attachedRigidbody.Velocity += (orthogonalProjection / (float)gameTime.ElapsedGameTime.TotalSeconds);
+                            c.attachedRigidbody.Velocity += (orthogonalProjection / Time.deltaTime);
                         }
-                        Velocity -= (orthogonalProjection / (float)gameTime.ElapsedGameTime.TotalSeconds);
+                        Velocity -= (orthogonalProjection / Time.deltaTime);
                         GameObject.Transform.GlobalPosition = oldPos;
                     }
                 }
