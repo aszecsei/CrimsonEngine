@@ -248,7 +248,18 @@ namespace CrimsonEngine.Physics
             base.Update(gameTime);
             if (Physics2D.drawDebugPhysics)
             {
-                Debug.DrawDebugRectangle(offset + Helpers.extractFromVector3(GameObject.Transform.GlobalPosition), size, Color.Green, 1);
+                Color c = Color.Green;
+                if(attachedRigidbody != null)
+                {
+                    if(attachedRigidbody.awake == true)
+                    {
+                        c = Color.Red;
+                    } else
+                    {
+                        c = Color.Blue;
+                    }
+                }
+                Debug.DrawDebugRectangle(offset + Helpers.extractFromVector3(GameObject.Transform.GlobalPosition), size, c, 1);
             }
         }
     }
