@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Input;
 
 using CrimsonEngine.Physics;
+using System.Collections;
 
 namespace CrimsonEngine
 {
@@ -51,6 +52,11 @@ namespace CrimsonEngine
         private RenderTarget2D lightRenderTarget;
         private RenderTarget2D shadowRenderTarget;
         private RenderTarget2D depthRenderTarget;
+
+        private List<IEnumerator> Coroutines = new List<IEnumerator>();
+        private List<IEnumerator> shouldRunNextFrame = new List<IEnumerator>();
+        private List<IEnumerator> shouldRunAtEndOfFrame = new List<IEnumerator>();
+        private SortedList<float, IEnumerator> shouldRunAfterTimes = new SortedList<float, IEnumerator>();
 
         private static readonly BlendState maxBlend = new BlendState()
         {
@@ -138,17 +144,113 @@ namespace CrimsonEngine
             Mouse.SetPosition((int)mPos.X, (int)mPos.Y);
         }
 
+        private void HandleCoroutine(IEnumerator coroutine, bool isAtEndOfFrame)
+        {
+            if (!coroutine.MoveNext())
+            {
+                // This coroutine has finished
+                return;
+            }
+
+            if (!(coroutine.Current is YieldInstruction))
+            {
+                // This coroutine yielded null, or some other value we don't understand; run it next frame.
+                shouldRunNextFrame.Add(coroutine);
+                return;
+            }
+
+            if (coroutine.Current is WaitForSeconds)
+            {
+                WaitForSeconds wait = (WaitForSeconds)coroutine.Current;
+                shouldRunAfterTimes.Add(Time.time + wait.duration, coroutine);
+            }
+            else if (coroutine.Current is WaitForEndOfFrame)
+            {
+                if (!isAtEndOfFrame)
+                    shouldRunAtEndOfFrame.Add(coroutine);
+                else
+                    Coroutines.Add(coroutine);
+            }
+            else if (coroutine.Current is WaitForFixedUpdate)
+            {
+                if(Time.time == Time.fixedTime)
+                {
+                    shouldRunAtEndOfFrame.Add(coroutine);
+                }
+                else
+                {
+                    shouldRunAfterTimes.Add(Time.fixedTime + Time.fixedTimestep, coroutine);
+                }
+            }
+        }
+
+        public void StartCoroutine(IEnumerator e)
+        {
+            Coroutines.Add(e);
+        }
+
         public void Update(GameTime gameTime)
         {
+            Time.deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds * Time.timeScale;
+            Time.time += Time.deltaTime;
 
-            // ClampMouseToWindow();
+            if(Time.time >= Time.fixedTime + Time.fixedTimestep)
+            {
+                Time.fixedDeltaTime = Time.time - Time.fixedTime;
+                Time.fixedTime = Time.time;
+            }
+
+            shouldRunNextFrame.Clear();
+            shouldRunAfterTimes.Clear();
+
+            List<float> remove = new List<float>();
+            foreach (KeyValuePair<float, IEnumerator> kvp in shouldRunAfterTimes)
+            {
+                if(kvp.Key < Time.time)
+                {
+                    Coroutines.Add(kvp.Value);
+                    remove.Add(kvp.Key);
+                }
+                else
+                {
+                    break;
+                }
+            }
+            foreach(float k in remove)
+            {
+                shouldRunAfterTimes.Remove(k);
+            }
+
+            foreach (IEnumerator coroutine in Coroutines)
+            {
+                HandleCoroutine(coroutine, false);
+            }
+
+            Coroutines = new List<IEnumerator>(shouldRunNextFrame);
 
             foreach (GameObject go in GameObjects)
             {
                 if (go.isActive)
                 {
-                    go.Update(gameTime);
+                    go.Update();
+                    if(Time.time == Time.fixedTime)
+                    {
+                        go.FixedUpdate();
+                    }
                 }
+            }
+
+            foreach (GameObject go in GameObjects)
+            {
+                if (go.isActive)
+                {
+                    go.LateUpdate();
+                }
+            }
+
+            foreach (IEnumerator coroutine in shouldRunAtEndOfFrame)
+            {
+                HandleCoroutine(coroutine, true);
             }
 
             // Insertion-sort the GameObject list

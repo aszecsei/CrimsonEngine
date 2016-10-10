@@ -49,6 +49,7 @@
   <ItemGroup>
     <Compile Include="Camera2D.cs" />
     <Compile Include="Component.cs" />
+    <Compile Include="Coroutine.cs" />
     <Compile Include="Debug.cs" />
     <Compile Include="GameObject.cs" />
     <Compile Include="Helpers.cs" />
@@ -68,7 +69,12 @@
     <Compile Include="Scene.cs" />
     <Compile Include="SceneManager.cs" />
     <Compile Include="SpriteRenderer.cs" />
+    <Compile Include="Time.cs" />
     <Compile Include="Transform.cs" />
+    <Compile Include="WaitForEndOfFrame.cs" />
+    <Compile Include="WaitForFixedUpdate.cs" />
+    <Compile Include="WaitForSeconds.cs" />
+    <Compile Include="YieldInstruction.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

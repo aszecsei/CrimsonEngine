@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -26,7 +27,11 @@ namespace CrimsonEngine
         /// This method is called every tick to update game logic.
         /// </summary>
         /// <param name="gameTime">The amount of time since the last method call.</param>
-        public virtual void Update(GameTime gameTime) { }
+        public virtual void Update() { }
+
+        public virtual void FixedUpdate() { }
+
+        public virtual void LateUpdate() { }
 
         /// <summary>
         /// The GameObject that owns the component instance.
@@ -56,6 +61,15 @@ namespace CrimsonEngine
             {
                 GameObject.AddComponent<U>();
             }
+        }
+
+        /// <summary>
+        /// Starts a given coroutine.
+        /// </summary>
+        /// <param name="coroutine">The coroutine to begin.</param>
+        public void StartCoroutine(IEnumerator coroutine)
+        {
+            SceneManager.CurrentScene.StartCoroutine(coroutine);
         }
     }
 }

@@ -62,12 +62,30 @@ namespace CrimsonEngine
             return null;
         }
 
-        public void Update(GameTime gameTime)
+        public void Update()
         {
             foreach (KeyValuePair<Type, Component> kvp in Components)
             {
                 if(kvp.Value.isActive)
-                    kvp.Value.Update(gameTime);
+                    kvp.Value.Update();
+            }
+        }
+
+        public void FixedUpdate()
+        {
+            foreach (KeyValuePair<Type, Component> kvp in Components)
+            {
+                if (kvp.Value.isActive)
+                    kvp.Value.FixedUpdate();
+            }
+        }
+
+        public void LateUpdate()
+        {
+            foreach (KeyValuePair<Type, Component> kvp in Components)
+            {
+                if (kvp.Value.isActive)
+                    kvp.Value.LateUpdate();
             }
         }
 
