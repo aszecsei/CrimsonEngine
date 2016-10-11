@@ -13,7 +13,7 @@ namespace CrimsonEngine.Physics
 {
     public class Rigidbody : Component
     {
-        private Body body;
+        internal Body body;
 
         public float friction
         {
@@ -484,7 +484,7 @@ namespace CrimsonEngine.Physics
         /// </remarks>
         /// <param name="layerMask">Any colliders on any of these layers count as touching.</param>
         /// <returns>Whether any of the collider(s) attached to this rigidbody are touching any colliders on the specified layerMask or not.</returns>
-        public bool IsTouchingLayers(uint layerMask = Physics2D.AllLayers)
+        public bool IsTouchingLayers(Category layerMask = Physics2D.AllLayers)
         {
             // TODO: Implement this.
             throw new NotImplementedException();
