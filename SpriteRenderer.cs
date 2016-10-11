@@ -18,6 +18,24 @@ namespace CrimsonEngine
 
         public Vector2 Origin = Vector2.Zero;
 
+        public bool flipHorizontal = false;
+        public bool flipVertical = false;
+
+        private SpriteEffects effect
+        {
+            get
+            {
+                if (!flipHorizontal && !flipVertical)
+                    return SpriteEffects.None;
+                else if (flipHorizontal && flipVertical)
+                    return SpriteEffects.FlipHorizontally | SpriteEffects.FlipVertically;
+                else if (flipHorizontal)
+                    return SpriteEffects.FlipHorizontally;
+                else
+                    return SpriteEffects.FlipVertically;
+            }
+        }
+
         public override void DrawDiffuse(SpriteBatch spriteBatch, GameTime gameTime)
         {
             if(Diffuse  != null)
@@ -27,7 +45,8 @@ namespace CrimsonEngine
                     color: TintColor, 
                     rotation: GameObject.Transform.GlobalRotation, 
                     origin: Origin, 
-                    scale: new Vector2(GameObject.Transform.GlobalScale.X, GameObject.Transform.GlobalScale.Y));
+                    scale: new Vector2(GameObject.Transform.GlobalScale.X, GameObject.Transform.GlobalScale.Y),
+                    effects:effect);
             }
             else
             {
@@ -44,7 +63,8 @@ namespace CrimsonEngine
                     color: TintColor,
                     rotation: GameObject.Transform.GlobalRotation,
                     origin: Origin,
-                    scale: new Vector2(GameObject.Transform.GlobalScale.X, GameObject.Transform.GlobalScale.Y));
+                    scale: new Vector2(GameObject.Transform.GlobalScale.X, GameObject.Transform.GlobalScale.Y),
+                    effects:effect);
             }
             else
             {
@@ -61,7 +81,8 @@ namespace CrimsonEngine
                     color: TintColor,
                     rotation: GameObject.Transform.GlobalRotation,
                     origin: Origin,
-                    scale: new Vector2(GameObject.Transform.GlobalScale.X, GameObject.Transform.GlobalScale.Y));
+                    scale: new Vector2(GameObject.Transform.GlobalScale.X, GameObject.Transform.GlobalScale.Y),
+                    effects:effect);
             }
             else
             {
@@ -78,7 +99,8 @@ namespace CrimsonEngine
                     color: TintColor,
                     rotation: GameObject.Transform.GlobalRotation,
                     origin: Origin,
-                    scale: new Vector2(GameObject.Transform.GlobalScale.X, GameObject.Transform.GlobalScale.Y));
+                    scale: new Vector2(GameObject.Transform.GlobalScale.X, GameObject.Transform.GlobalScale.Y),
+                    effects: effect);
             }
             else
             {

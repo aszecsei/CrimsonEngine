@@ -62,6 +62,8 @@
     <Compile Include="Physics\CollisionDetectionMode.cs" />
     <Compile Include="Physics\ForceMode.cs" />
     <Compile Include="Physics\Physics2D.cs" />
+    <Compile Include="Physics\PhysicsLayer.cs" />
+    <Compile Include="Physics\RaycastHit.cs" />
     <Compile Include="Physics\Rigidbody.cs" />
     <Compile Include="Physics\RigidbodySleepMode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

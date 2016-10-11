@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework;
 
 namespace CrimsonEngine
 {
-    class Helpers
+    public class Helpers
     {
         public static bool IsSameOrSubclass(Type potentialBase, Type potentialDescendant)
         {

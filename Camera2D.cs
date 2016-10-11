@@ -61,8 +61,9 @@ namespace CrimsonEngine
 
         public Vector2 WorldToScreen(Vector2 worldPosition)
         {
-            return Vector2.Transform(worldPosition, TranslationMatrix);
-            
+            Vector2 result = Vector2.Transform(worldPosition, TranslationMatrix);
+            result.Y *= -1;
+            return result;
         }
 
         public Vector2 ScreenToWorld(Vector2 screenPosition)
@@ -72,7 +73,9 @@ namespace CrimsonEngine
                 screenPosition.X *= SceneManager.CurrentScene.InternalResolution.X / SceneManager.CurrentScene.GraphicsDevice.Viewport.Width;
                 screenPosition.Y *= SceneManager.CurrentScene.InternalResolution.Y / SceneManager.CurrentScene.GraphicsDevice.Viewport.Height;
             }
-            return Vector2.Transform(screenPosition, Matrix.Invert(TranslationMatrix));
+            Vector2 result = Vector2.Transform(screenPosition, Matrix.Invert(TranslationMatrix));
+            result.Y *= -1;
+            return result;
         }
 
         public Vector3 WorldToScreen(Vector3 worldPosition)

@@ -93,7 +93,7 @@ namespace CrimsonEngine.Physics
 
         public static implicit operator bool(RaycastHit rh)
         {
-            return rh.collider != null;
+            return rh != null && rh.collider != null;
         }
     }
 }
