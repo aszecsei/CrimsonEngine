@@ -159,6 +159,25 @@ namespace CrimsonEngine
         }
     }
 
+    class DebugPolygon : DebugShape
+    {
+        public Vector2[] verts;
+        public Color color;
+        public int lineWidth;
+
+        public DebugPolygon(Vector2[] verts, Color color, int lineWidth)
+        {
+            this.verts = verts;
+            this.color = color;
+            this.lineWidth = lineWidth;
+        }
+
+        public override void Draw(SpriteBatch spriteBatch, GameTime gameTime)
+        {
+            DrawPolygon(spriteBatch, verts, verts.Length, color, lineWidth);
+        }
+    }
+
     public class Debug
     {
         private static List<DebugShape> toDraw = new List<DebugShape>();
@@ -176,6 +195,11 @@ namespace CrimsonEngine
         public static void DrawDebugLine(Vector2 from, Vector2 to, Color color, int lineWidth)
         {
             toDraw.Add(new DebugLine(from, to, color, lineWidth));
+        }
+
+        public static void DrawDebugPolygon(Vector2[] verts, Color color, int lineWidth)
+        {
+            toDraw.Add(new DebugPolygon(verts, color, lineWidth));
         }
 
         internal static void Draw(SpriteBatch spriteBatch, GameTime gameTime)

@@ -31,7 +31,7 @@ namespace CrimsonEngine
             }
             else
             {
-                // TODO: Draw blank diffuse map
+                // no need to draw, since it's transparent!
             }
         }
 

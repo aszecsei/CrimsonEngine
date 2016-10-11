@@ -10,9 +10,9 @@ namespace CrimsonEngine
     {
         public static float time = 0.0f;
         public static float deltaTime = 0.0f;
-        public static float fixedDeltaTime = 0.0f;
+        public static float fixedDeltaTime = 0.01f;
+        internal static float actualFixedDeltaTime = fixedDeltaTime;
         public static float fixedTime = 0.0f;
         public static float timeScale = 1.0f;
-        public static float fixedTimestep = 1.0f / 30.0f;
     }
 }

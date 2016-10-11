@@ -75,7 +75,16 @@ namespace CrimsonEngine
         {
             foreach (KeyValuePair<Type, Component> kvp in Components)
             {
-                if (kvp.Value.isActive)
+                if (kvp.Value.isActive && !(kvp.Value is Physics.Rigidbody))
+                    kvp.Value.FixedUpdate();
+            }
+        }
+
+        public void PhysicsUpdate()
+        {
+            foreach (KeyValuePair<Type, Component> kvp in Components)
+            {
+                if (kvp.Value.isActive && (kvp.Value is Physics.Rigidbody))
                     kvp.Value.FixedUpdate();
             }
         }
@@ -177,6 +186,20 @@ namespace CrimsonEngine
             foreach(Transform t in Transform.GetChildren())
             {
                 t.GameObject.BroadcastMessage(name, parameterArray);
+            }
+        }
+
+        /// <summary>
+        /// Calls the method named on every component in this game object and on every ancestor of the behaviour.
+        /// </summary>
+        /// <param name="name">The name of the method to call.</param>
+        /// <param name="parameterArray">The parameters to pass to the method.</param>
+        public void SendMessageUpwards(String name, params object[] parameterArray)
+        {
+            SendMessage(name, parameterArray);
+            if(Transform.Parent != null)
+            {
+                Transform.Parent.GameObject.SendMessageUpwards(name, parameterArray);
             }
         }
 

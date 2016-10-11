@@ -18,7 +18,6 @@ namespace CrimsonEngine
         public Color backgroundColor = Color.CornflowerBlue;
 
         public List<GameObject> GameObjects;
-        public List<GameObject> PhysicsObjects;
 
         public bool shouldDrawFrameRate = false;
 
@@ -56,6 +55,7 @@ namespace CrimsonEngine
         private List<IEnumerator> Coroutines = new List<IEnumerator>();
         private List<IEnumerator> shouldRunNextFrame = new List<IEnumerator>();
         private List<IEnumerator> shouldRunAtEndOfFrame = new List<IEnumerator>();
+        private List<IEnumerator> shouldRunAtFixedTimestep = new List<IEnumerator>();
         private SortedList<float, IEnumerator> shouldRunAfterTimes = new SortedList<float, IEnumerator>();
 
         private static readonly BlendState maxBlend = new BlendState()
@@ -72,7 +72,6 @@ namespace CrimsonEngine
         {
             this.graphicsDevice = graphicsDevice;
             GameObjects = new List<GameObject>();
-            PhysicsObjects = new List<GameObject>();
             _internalResolution = internalResolution;
 
             diffuseRenderTarget = new RenderTarget2D(graphicsDevice, (int)internalResolution.X, (int)internalResolution.Y);
@@ -80,6 +79,8 @@ namespace CrimsonEngine
             lightRenderTarget = new RenderTarget2D(graphicsDevice, (int)internalResolution.X, (int)internalResolution.Y);
             shadowRenderTarget = new RenderTarget2D(graphicsDevice, (int)internalResolution.X, (int)internalResolution.Y);
             depthRenderTarget = new RenderTarget2D(graphicsDevice, (int)internalResolution.X, (int)internalResolution.Y);
+
+            Physics2D.Initialize();
         }
 
         public GameObject InstantiateGameObject()
@@ -173,14 +174,7 @@ namespace CrimsonEngine
             }
             else if (coroutine.Current is WaitForFixedUpdate)
             {
-                if(Time.time == Time.fixedTime)
-                {
-                    shouldRunAtEndOfFrame.Add(coroutine);
-                }
-                else
-                {
-                    shouldRunAfterTimes.Add(Time.fixedTime + Time.fixedTimestep, coroutine);
-                }
+                shouldRunAtFixedTimestep.Add(coroutine);
             }
         }
 
@@ -191,17 +185,46 @@ namespace CrimsonEngine
 
         public void Update(GameTime gameTime)
         {
+            shouldRunNextFrame.Clear();
+
             Time.deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds * Time.timeScale;
             Time.time += Time.deltaTime;
 
-            if(Time.time >= Time.fixedTime + Time.fixedTimestep)
+            int numTimesToRunFixedUpdate = 1;
+            if (Time.fixedDeltaTime != 0)
             {
-                Time.fixedDeltaTime = Time.time - Time.fixedTime;
-                Time.fixedTime = Time.time;
+                numTimesToRunFixedUpdate = (int)Math.Floor((float)(Time.time - Time.fixedTime) / Time.fixedDeltaTime);
             }
 
-            shouldRunNextFrame.Clear();
-            shouldRunAfterTimes.Clear();
+            // Never run our physics solver more than 5 times per frame
+            if(numTimesToRunFixedUpdate > 5)
+            {
+                float dT = numTimesToRunFixedUpdate * Time.fixedDeltaTime;
+                Time.actualFixedDeltaTime = Time.fixedDeltaTime / 5;
+                numTimesToRunFixedUpdate = 5;
+            }
+            numFixedUpdates = numTimesToRunFixedUpdate;
+
+            for (int i = 0; i < numTimesToRunFixedUpdate; i++)
+            {
+                Time.fixedTime += Time.fixedDeltaTime;
+                foreach (GameObject go in GameObjects)
+                {
+                    if (go.isActive)
+                    {
+                        go.FixedUpdate();
+                    }
+                }
+
+                Physics2D.Simulate();
+            }
+
+            List<IEnumerator> mFixed = new List<IEnumerator>(shouldRunAtFixedTimestep);
+            foreach(IEnumerator e in mFixed)
+            {
+                shouldRunAtFixedTimestep.Remove(e);
+                HandleCoroutine(e, false);
+            }
 
             List<float> remove = new List<float>();
             foreach (KeyValuePair<float, IEnumerator> kvp in shouldRunAfterTimes)
@@ -233,10 +256,6 @@ namespace CrimsonEngine
                 if (go.isActive)
                 {
                     go.Update();
-                    if(Time.time == Time.fixedTime)
-                    {
-                        go.FixedUpdate();
-                    }
                 }
             }
 
@@ -272,27 +291,12 @@ namespace CrimsonEngine
             }
         }
 
-        public List<Collider> GetAllColliders()
-        {
-            List<Collider> result = new List<Collider>();
-            foreach (GameObject go in PhysicsObjects)
-            {
-                if(go.isActive)
-                {
-                    Collider c = go.GetComponentOrSubclass<Collider>();
-                    if(c != null && c.isActive)
-                    {
-                        result.Add(c);
-                    }
-                }
-            }
-            return result;
-        }
-
         private bool shouldDraw(GameObject go)
         {
             return go.isActive && (go.Transform.GlobalPosition.Z >= Camera2D.main.Transform.GlobalPosition.Z);
         }
+
+        private int numFixedUpdates = 0;
 
         private void DrawScene(SpriteBatch spriteBatch, GameTime gameTime)
         {
@@ -462,7 +466,7 @@ namespace CrimsonEngine
                     averageFramesPerSecond = currentFramesPerSecond;
                 }
 
-                var fps = string.Format("FPS: {0}", averageFramesPerSecond);
+                var fps = string.Format("FPS: {0}\nDelta Time: {1}\nFixed Updates Per Frame: {2}", averageFramesPerSecond, Time.deltaTime, numFixedUpdates);
 
                 spriteBatch.Begin();
                 spriteBatch.DrawString(ResourceManager.GetResource<SpriteFont>("Debug Font"), fps, new Vector2(10, 10), Color.White);
