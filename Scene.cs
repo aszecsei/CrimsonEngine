@@ -183,6 +183,17 @@ namespace CrimsonEngine
             Coroutines.Add(e);
         }
 
+        public void Awake()
+        {
+            foreach(GameObject go in GameObjects)
+            {
+                if (go.isActive)
+                {
+                    go.Awake();
+                }
+            }
+        }
+
         public void Update(GameTime gameTime)
         {
             shouldRunNextFrame.Clear();

@@ -11,6 +11,17 @@ namespace CrimsonEngine
 {
     public class GameObject
     {
+        internal void Awake()
+        {
+            foreach(Component c in Components.Values)
+            {
+                if(c.isActive)
+                {
+                    c.Awake();
+                }
+            }
+        }
+
         private Dictionary<Type, Component> Components;
 
         public bool isActive = true;
@@ -217,5 +228,7 @@ namespace CrimsonEngine
         {
             return SceneManager.CurrentScene.InstantiateGameObject();
         }
+
+        public Physics.PhysicsLayer layer = Physics.PhysicsLayer.Layer1;
     }
 }

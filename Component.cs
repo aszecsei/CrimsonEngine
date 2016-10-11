@@ -17,6 +17,8 @@ namespace CrimsonEngine
         /// </summary>
         public bool isActive = true;
 
+        public virtual void Awake() { }
+
         /// <summary>
         /// This method is called after the game object has been set and the component's
         /// values have been initialized.
@@ -32,6 +34,23 @@ namespace CrimsonEngine
         public virtual void FixedUpdate() { }
 
         public virtual void LateUpdate() { }
+
+        public Transform transform
+        {
+            get
+            {
+                return GameObject.Transform;
+            }
+            set
+            {
+                GameObject.Transform = value;
+            }
+        }
+
+        public T GetComponent<T>() where T : Component
+        {
+            return GameObject.GetComponent<T>();
+        }
 
         /// <summary>
         /// The GameObject that owns the component instance.

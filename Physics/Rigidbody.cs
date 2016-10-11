@@ -15,6 +15,57 @@ namespace CrimsonEngine.Physics
     {
         internal Body body;
 
+        private FarseerPhysics.Collision.AABB AABB
+        {
+            get
+            {
+                FarseerPhysics.Collision.AABB result = new FarseerPhysics.Collision.AABB();
+                result.LowerBound = new Vector2(float.MaxValue, float.MaxValue);
+                result.UpperBound = new Vector2(float.MinValue, float.MinValue);
+                List<Fixture> fixList = body.FixtureList;
+                foreach(Fixture f in fixList)
+                {
+                    FarseerPhysics.Collision.AABB fixAABB;
+                    int childCount = f.Shape.ChildCount;
+                    for(int child = 0; child < childCount; ++child)
+                    {
+                        f.GetAABB(out fixAABB, child);
+                        result.Combine(ref result, ref fixAABB);
+                    }
+                }
+
+                return result;
+            }
+        }
+
+        public Bounds bounds
+        {
+            get
+            {
+                return new Bounds(AABB.Center * Physics2D.unitToPixel, new Vector2(AABB.Width * Physics2D.unitToPixel, AABB.Height * Physics2D.unitToPixel));
+            }
+        }
+
+        public Vector2 size
+        {
+            get
+            {
+                return new Vector2(AABB.Width * Physics2D.unitToPixel, AABB.Height * Physics2D.unitToPixel);
+            }
+        }
+
+        public float restitution
+        {
+            get
+            {
+                return body.Restitution;
+            }
+            set
+            {
+                body.Restitution = value;
+            }
+        }
+
         public float friction
         {
             get
@@ -637,6 +688,7 @@ namespace CrimsonEngine.Physics
 
         public override void Update()
         {
+
             Color c = Color.White;
             int lw = 1;
 

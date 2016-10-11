@@ -51,6 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AnimationCurve.cs" />
     <Compile Include="Camera2D.cs" />
     <Compile Include="Component.cs" />
     <Compile Include="Coroutine.cs" />
@@ -58,7 +59,10 @@
     <Compile Include="GameObject.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="InputManager.cs" />
+    <Compile Include="Keyframe.cs" />
     <Compile Include="Light.cs" />
+    <Compile Include="Mathf.cs" />
+    <Compile Include="Physics\Bounds.cs" />
     <Compile Include="Physics\CollisionDetectionMode.cs" />
     <Compile Include="Physics\ForceMode.cs" />
     <Compile Include="Physics\Physics2D.cs" />
@@ -71,12 +75,15 @@
     <Compile Include="ResourceManager.cs" />
     <Compile Include="Scene.cs" />
     <Compile Include="SceneManager.cs" />
+    <Compile Include="Space.cs" />
     <Compile Include="SpriteRenderer.cs" />
     <Compile Include="Time.cs" />
     <Compile Include="Transform.cs" />
+    <Compile Include="VectorExtensions.cs" />
     <Compile Include="WaitForEndOfFrame.cs" />
     <Compile Include="WaitForFixedUpdate.cs" />
     <Compile Include="WaitForSeconds.cs" />
+    <Compile Include="WrapMode.cs" />
     <Compile Include="YieldInstruction.cs" />
   </ItemGroup>
   <ItemGroup>

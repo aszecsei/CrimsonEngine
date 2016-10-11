@@ -137,7 +137,7 @@ namespace CrimsonEngine.Physics
         /// The number of iterations of the physics solver when considering objects' velocities.
         /// A higher number of interations will improve accuracy at the expense of processing overhead.
         /// </summary>
-        public static int velocityIterations = 3;
+        public static int velocityIterations = 5;
 
         /// <summary>
         /// Any collisions with a relative linear velocity below this threshold will be treated as inelastic.
@@ -238,17 +238,17 @@ namespace CrimsonEngine.Physics
         /// <param name="layer1">ID of the first layer.</param>
         /// <param name="layer2">ID of the second layer.</param>
         /// <param name="ignore">Should collisions between these layers be ignored?</param>
-        public static void IgnoreLayerCollision(Category layer1, Category layer2, bool ignore = true)
+        public static void IgnoreLayerCollision(PhysicsLayer layer1, PhysicsLayer layer2, bool ignore = true)
         {
             if(ignore)
             {
                 // TODO: Implement this
-                throw new NotImplementedException();
+                // throw new NotImplementedException();
             }
             else
             {
                 // TODO: Implement this
-                throw new NotImplementedException();
+                // throw new NotImplementedException();
             }
         }
 
@@ -479,7 +479,7 @@ namespace CrimsonEngine.Physics
                 rh = new RaycastHit();
                 rh.centroid = origin;
                 rh.collider = fixture;
-                rh.distance = Vector2.Distance(point, origin) * unitToPixel;
+                rh.distance = Vector2.Distance(point * unitToPixel, origin);
                 rh.fraction = fraction * unitToPixel;
                 rh.normal = normal * unitToPixel;
                 rh.point = point * unitToPixel;
@@ -496,15 +496,16 @@ namespace CrimsonEngine.Physics
                 }
                 rh.transform = rh.rigidbody.GameObject.Transform;
                 if (queriesStartInColliders || rh.distance > 0)
-                    return 0;
+                    return fraction;
                 else
                     return 1;
                     
             };
 
-            Vector2 point2 = origin + direction;
+            Vector2 point2 = new Vector2(direction.X, direction.Y);
             point2.Normalize();
             point2 *= distance;
+            point2 += origin;
             world.RayCast(get_first_callback, origin * pixelToUnit, point2 * pixelToUnit);
             return rh;
         }
@@ -521,7 +522,7 @@ namespace CrimsonEngine.Physics
             throw new NotImplementedException();
         }
 
-        public static void SetLayerCollisionMask(Category layer, Category layerMask)
+        public static void SetLayerCollisionMask(PhysicsLayer layer, PhysicsLayer layerMask)
         {
             // TODO: Implement this.
             throw new NotImplementedException();

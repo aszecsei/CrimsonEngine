@@ -8,7 +8,7 @@ using FarseerPhysics.Dynamics;
 namespace CrimsonEngine.Physics
 {
     [Flags]
-    public enum PhysicsLayer
+    public enum PhysicsLayer : int
     {
         AllLayers = Category.All,
         Layer1 = Category.Cat1,

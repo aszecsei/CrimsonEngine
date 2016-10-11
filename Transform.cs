@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 using Microsoft.Xna.Framework;
 
+using CrimsonEngine.Physics;
+
 namespace CrimsonEngine
 {
     public class Transform : Component
@@ -25,6 +27,29 @@ namespace CrimsonEngine
 
                 _parent = value;
                 _parent._children.Add(this);
+            }
+        }
+
+        public void Translate(Vector2 deltaMovement, Space mode)
+        {
+            if(mode == Space.World)
+            {
+                Vector3 pos = GlobalPosition;
+                pos.X += deltaMovement.X;
+                pos.Y += deltaMovement.Y;
+                GlobalPosition = pos;
+            }
+            else
+            {
+                Vector3 pos = LocalPosition;
+                pos.X += deltaMovement.X;
+                pos.Y += deltaMovement.Y;
+                LocalPosition = pos;
+            }
+            Rigidbody rb = GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.position += deltaMovement * Physics2D.pixelToUnit;
             }
         }
 
