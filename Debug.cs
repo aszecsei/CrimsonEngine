@@ -31,13 +31,8 @@ namespace CrimsonEngine
         protected virtual void DrawLineSegment(SpriteBatch spriteBatch, Vector2 from, Vector2 to, Color color, int lineWidth)
         {
             // translate to screen-space
-            Vector2 screenFrom = from;
-            screenFrom.y *= -1;
-
-            screenFrom = Camera2D.main.WorldToScreen(screenFrom);
-            Vector2 screenTo = to;
-            screenTo.y *= -1;
-            screenTo = Camera2D.main.WorldToScreen(screenTo);
+            Vector2 screenFrom = Camera2D.main.WorldToScreen(from);
+            Vector2 screenTo = Camera2D.main.WorldToScreen(to);
 
             float angle = (float)Math.Atan2(screenFrom.y - screenTo.y, screenFrom.x - screenTo.y);
             float length = Vector2.Distance(screenFrom, screenTo);
