@@ -142,6 +142,9 @@ namespace CrimsonEngine
                 }
             }
 
+            if (rightKey.time - leftKey.time == 0)
+                return 0f;
+
             return Mathf.Lerp(leftKey.value, rightKey.value, (time - leftKey.time) / (rightKey.time - leftKey.time));
         }
 

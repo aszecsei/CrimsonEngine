@@ -32,15 +32,16 @@ namespace CrimsonEngine
         {
             // translate to screen-space
             Vector2 screenFrom = from;
-            screenFrom.Y *= -1;
-            screenFrom = Vector2.Transform(screenFrom, Camera2D.main.TranslationMatrix);
-            Vector2 screenTo = to;
-            screenTo.Y *= -1;
-            screenTo = Vector2.Transform(screenTo, Camera2D.main.TranslationMatrix);
+            screenFrom.y *= -1;
 
-            float angle = (float)Math.Atan2(screenFrom.Y - screenTo.Y, screenFrom.X - screenTo.X);
+            screenFrom = Camera2D.main.WorldToScreen(screenFrom);
+            Vector2 screenTo = to;
+            screenTo.y *= -1;
+            screenTo = Camera2D.main.WorldToScreen(screenTo);
+
+            float angle = (float)Math.Atan2(screenFrom.y - screenTo.y, screenFrom.x - screenTo.y);
             float length = Vector2.Distance(screenFrom, screenTo);
-            spriteBatch.Draw(BlankTexture(), screenTo, null, color, angle, Vector2.Zero, new Vector2(length, lineWidth), SpriteEffects.None, 0f);
+            spriteBatch.Draw(BlankTexture(), screenTo, null, color, angle, Vector2.zero, new Vector2(length, lineWidth), SpriteEffects.None, 0f);
         }
 
         public abstract void Draw(SpriteBatch spriteBatch, GameTime gameTime);
@@ -57,7 +58,7 @@ namespace CrimsonEngine
         {
             get
             {
-                return center.X - (size.X / 2);
+                return center.x - (size.x / 2);
             }
         }
 
@@ -65,7 +66,7 @@ namespace CrimsonEngine
         {
             get
             {
-                return center.X + (size.X / 2);
+                return center.x + (size.x / 2);
             }
         }
 
@@ -73,7 +74,7 @@ namespace CrimsonEngine
         {
             get
             {
-                return center.Y + (size.Y / 2);
+                return center.y + (size.y / 2);
             }
         }
 
@@ -81,7 +82,7 @@ namespace CrimsonEngine
         {
             get
             {
-                return center.Y - (size.Y / 2);
+                return center.y - (size.y / 2);
             }
         }
 

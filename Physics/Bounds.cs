@@ -4,23 +4,44 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using Microsoft.Xna.Framework;
+using FarseerPhysics.Collision;
 
 namespace CrimsonEngine.Physics
 {
+    /// <summary>
+    /// Represents an axis aligned bounding box.
+    /// </summary>
+    /// <remarks>
+    /// An axis-aligned bounding box, or AABB for short, is a box aligned with coordinate axes and
+    /// fully enclosing some object. Because the box is never rotated with respect to the axes, it
+    /// can be defined by just its center and extents, or alternatively by min and max points.
+    /// </remarks>
     public class Bounds
     {
-        public Vector2 center = Vector2.Zero;
-        public Vector2 size = Vector2.Zero;
+        /// <summary>
+        /// The center of the bounding box.
+        /// </summary>
+        public Vector2 center;
 
+        /// <summary>
+        /// The total size of the box. This is always twice as large as the extents.
+        /// </summary>
+        public Vector2 size;
+
+        /// <summary>
+        /// The extents of the box. This is always half of the size.
+        /// </summary>
         public Vector2 extents
         {
             get
             {
-                return size / 2f;
+                return size / 2.0f;
             }
         }
 
+        /// <summary>
+        /// The maximal point of the box. This is always equal to center+extents.
+        /// </summary>
         public Vector2 max
         {
             get
@@ -29,6 +50,9 @@ namespace CrimsonEngine.Physics
             }
         }
 
+        /// <summary>
+        /// The minimal point of the box. This is always equal to center-extents.
+        /// </summary>
         public Vector2 min
         {
             get
@@ -42,23 +66,5 @@ namespace CrimsonEngine.Physics
             this.center = center;
             this.size = size;
         }
-
-        public Bounds(float left, float top, float right, float bottom)
-        {
-            this.center = new Vector2((left + right) / 2f, (top + bottom) / 2f);
-            this.size = new Vector2(right - left, top - bottom);
-        }
-
-        /// <summary>
-        /// Expand the bounds by increasing its size by amount along each side.
-        /// </summary>
-        /// <param name="amount"></param>
-        public void Expand(float amount)
-        {
-            this.size.X += amount;
-            this.size.Y += amount;
-        }
-
-
     }
 }

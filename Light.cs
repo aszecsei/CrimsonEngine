@@ -10,7 +10,7 @@ namespace CrimsonEngine
 {
     public class Light : Component
     {
-        public Color Color = Color.White;
+        public Color Color = Color.white;
         public float Intensity = 1f;
         public float Range = 200f;
         public float Length = 0f;

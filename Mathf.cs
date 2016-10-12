@@ -97,7 +97,7 @@ namespace CrimsonEngine
         /// <returns></returns>
         public static float Clamp(float value, float min, float max)
         {
-            return Math.Min(Math.Max(value, min), max);
+            return Mathf.Min(Mathf.Max(value, min), max);
         }
 
         /// <summary>
@@ -210,7 +210,8 @@ namespace CrimsonEngine
         /// <returns></returns>
         public static float Lerp(float a, float b, float t)
         {
-            return (Mathf.Clamp01(t) * (b - a)) + a;
+            t = Mathf.Clamp01(t);
+            return (1 - t) * a + t * b;
         }
 
         /// <summary>
@@ -241,7 +242,7 @@ namespace CrimsonEngine
         /// <returns></returns>
         public static float LerpUnclamped(float a, float b, float t)
         {
-            return (t * (b - a)) + a;
+            return (1 - t) * a + t * b;
         }
 
         public static float Log(float f, float p)

@@ -35,21 +35,16 @@ namespace CrimsonEngine
             if(mode == Space.World)
             {
                 Vector3 pos = GlobalPosition;
-                pos.X += deltaMovement.X;
-                pos.Y += deltaMovement.Y;
+                pos.x += deltaMovement.x;
+                pos.y += deltaMovement.y;
                 GlobalPosition = pos;
             }
             else
             {
                 Vector3 pos = LocalPosition;
-                pos.X += deltaMovement.X;
-                pos.Y += deltaMovement.Y;
+                pos.x += deltaMovement.x;
+                pos.y += deltaMovement.y;
                 LocalPosition = pos;
-            }
-            Rigidbody rb = GetComponent<Rigidbody>();
-            if (rb != null)
-            {
-                rb.position += deltaMovement * Physics2D.pixelToUnit;
             }
         }
 
@@ -61,7 +56,7 @@ public Vector3 GlobalPosition
         if (Parent != null)
         {
             // rotate and scale the local position
-            Matrix transformationMatrix = Matrix.CreateScale(new Vector3(GlobalScale.X, GlobalScale.Y, 1)) * Matrix.CreateRotationZ(GlobalRotation);
+            Matrix transformationMatrix = Matrix.CreateScale(new Vector3(GlobalScale.x, GlobalScale.y, 1)) * Matrix.CreateRotationZ(GlobalRotation);
             Vector3 transformedLocal = Vector3.Transform(LocalPosition, transformationMatrix);
             return transformedLocal + Parent.GlobalPosition;
         }
@@ -74,7 +69,7 @@ public Vector3 GlobalPosition
         if (Parent != null)
         {
             // rotate and scale the local position
-            Matrix transformationMatrix = Matrix.CreateScale(new Vector3(GlobalScale.X, GlobalScale.Y, 1)) * Matrix.CreateRotationZ(GlobalRotation);
+            Matrix transformationMatrix = Matrix.CreateScale(new Vector3(GlobalScale.x, GlobalScale.y, 1)) * Matrix.CreateRotationZ(GlobalRotation);
             Vector3 transformedGlobal = Vector3.Transform(value, Matrix.Invert(transformationMatrix));
             LocalPosition = transformedGlobal;
             return;
@@ -122,7 +117,7 @@ public Vector2 GlobalScale
     {
         if (Parent != null)
         {
-            return LocalScale * Parent.GlobalScale;
+            return Vector2.Scale(LocalScale, Parent.GlobalScale);
         }
 
         return LocalScale;
@@ -132,7 +127,7 @@ public Vector2 GlobalScale
     {
         if (Parent != null)
         {
-            LocalScale = value / Parent.GlobalScale;
+            LocalScale = new Vector2(value.x / GlobalScale.x, value.y / GlobalScale.y);
             return;
         }
 
@@ -152,9 +147,9 @@ public Vector2 GlobalScale
             _children = new List<Transform>();
             _parent = null;
 
-            LocalPosition = Vector3.Zero;
+            LocalPosition = Vector3.zero;
             LocalRotation = 0;
-            LocalScale = Vector2.One;
+            LocalScale = Vector2.one;
         }
     }
 }

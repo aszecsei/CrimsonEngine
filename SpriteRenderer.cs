@@ -14,9 +14,9 @@ namespace CrimsonEngine
         public Texture2D Specular = null;
         public Texture2D Emissive = null;
 
-        public Color TintColor = Color.White;
+        public Color TintColor = Color.white;
 
-        public Vector2 Origin = Vector2.Zero;
+        public Vector2 Origin = Vector2.zero;
 
         public bool flipHorizontal = false;
         public bool flipVertical = false;
@@ -41,11 +41,11 @@ namespace CrimsonEngine
             if(Diffuse  != null)
             {
                 spriteBatch.Draw(texture: Diffuse, 
-                    position: new Vector2(GameObject.Transform.GlobalPosition.X, -GameObject.Transform.GlobalPosition.Y), 
+                    position: new Vector2(GameObject.Transform.GlobalPosition.x, -GameObject.Transform.GlobalPosition.y), 
                     color: TintColor, 
                     rotation: GameObject.Transform.GlobalRotation, 
                     origin: Origin, 
-                    scale: new Vector2(GameObject.Transform.GlobalScale.X, GameObject.Transform.GlobalScale.Y),
+                    scale: new Vector2(GameObject.Transform.GlobalScale.x, GameObject.Transform.GlobalScale.y),
                     effects:effect);
             }
             else
@@ -59,11 +59,11 @@ namespace CrimsonEngine
             if (Normal != null)
             {
                 spriteBatch.Draw(texture: Normal,
-                    position: new Vector2(GameObject.Transform.GlobalPosition.X, -GameObject.Transform.GlobalPosition.Y),
+                    position: new Vector2(GameObject.Transform.GlobalPosition.x, -GameObject.Transform.GlobalPosition.y),
                     color: TintColor,
                     rotation: GameObject.Transform.GlobalRotation,
                     origin: Origin,
-                    scale: new Vector2(GameObject.Transform.GlobalScale.X, GameObject.Transform.GlobalScale.Y),
+                    scale: new Vector2(GameObject.Transform.GlobalScale.x, GameObject.Transform.GlobalScale.y),
                     effects:effect);
             }
             else
@@ -77,11 +77,11 @@ namespace CrimsonEngine
             if (Emissive != null)
             {
                 spriteBatch.Draw(texture: Emissive,
-                    position: new Vector2(GameObject.Transform.GlobalPosition.X, -GameObject.Transform.GlobalPosition.Y),
+                    position: new Vector2(GameObject.Transform.GlobalPosition.x, -GameObject.Transform.GlobalPosition.y),
                     color: TintColor,
                     rotation: GameObject.Transform.GlobalRotation,
                     origin: Origin,
-                    scale: new Vector2(GameObject.Transform.GlobalScale.X, GameObject.Transform.GlobalScale.Y),
+                    scale: new Vector2(GameObject.Transform.GlobalScale.x, GameObject.Transform.GlobalScale.y),
                     effects:effect);
             }
             else
@@ -95,11 +95,11 @@ namespace CrimsonEngine
             if (Specular != null)
             {
                 spriteBatch.Draw(texture: Specular,
-                    position: new Vector2(GameObject.Transform.GlobalPosition.X, -GameObject.Transform.GlobalPosition.Y),
+                    position: new Vector2(GameObject.Transform.GlobalPosition.x, -GameObject.Transform.GlobalPosition.y),
                     color: TintColor,
                     rotation: GameObject.Transform.GlobalRotation,
                     origin: Origin,
-                    scale: new Vector2(GameObject.Transform.GlobalScale.X, GameObject.Transform.GlobalScale.Y),
+                    scale: new Vector2(GameObject.Transform.GlobalScale.x, GameObject.Transform.GlobalScale.y),
                     effects: effect);
             }
             else

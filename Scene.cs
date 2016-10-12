@@ -15,11 +15,12 @@ namespace CrimsonEngine
 {
     public class Scene
     {
-        public Color backgroundColor = Color.CornflowerBlue;
+        public Color backgroundColor = Color.black;
 
         public List<GameObject> GameObjects;
 
         public bool shouldDrawFrameRate = false;
+        public bool clampMouseToWindow = false;
 
         private float averageFramesPerSecond;
         private float currentFramesPerSecond;
@@ -37,7 +38,7 @@ namespace CrimsonEngine
             }
         }
 
-        private Vector2 _internalResolution = Vector2.Zero;
+        private Vector2 _internalResolution = Vector2.zero;
         public Vector2 InternalResolution
         {
             get
@@ -74,11 +75,11 @@ namespace CrimsonEngine
             GameObjects = new List<GameObject>();
             _internalResolution = internalResolution;
 
-            diffuseRenderTarget = new RenderTarget2D(graphicsDevice, (int)internalResolution.X, (int)internalResolution.Y);
-            normalRenderTarget = new RenderTarget2D(graphicsDevice, (int)internalResolution.X, (int)internalResolution.Y);
-            lightRenderTarget = new RenderTarget2D(graphicsDevice, (int)internalResolution.X, (int)internalResolution.Y);
-            shadowRenderTarget = new RenderTarget2D(graphicsDevice, (int)internalResolution.X, (int)internalResolution.Y);
-            depthRenderTarget = new RenderTarget2D(graphicsDevice, (int)internalResolution.X, (int)internalResolution.Y);
+            diffuseRenderTarget = new RenderTarget2D(graphicsDevice, (int)internalResolution.x, (int)internalResolution.y);
+            normalRenderTarget = new RenderTarget2D(graphicsDevice, (int)internalResolution.x, (int)internalResolution.y);
+            lightRenderTarget = new RenderTarget2D(graphicsDevice, (int)internalResolution.x, (int)internalResolution.y);
+            shadowRenderTarget = new RenderTarget2D(graphicsDevice, (int)internalResolution.x, (int)internalResolution.y);
+            depthRenderTarget = new RenderTarget2D(graphicsDevice, (int)internalResolution.x, (int)internalResolution.y);
 
             Physics2D.Initialize();
         }
@@ -103,9 +104,9 @@ namespace CrimsonEngine
         public void ClampMouseToWindow()
         {
             float aspectRatio;
-            if (InternalResolution != Vector2.Zero)
+            if (InternalResolution != Vector2.zero)
             {
-                aspectRatio = InternalResolution.X / InternalResolution.Y;
+                aspectRatio = InternalResolution.x / InternalResolution.y;
             }
             else
             {
@@ -139,10 +140,10 @@ namespace CrimsonEngine
                 viewport = new Rectangle(0, difference, graphicsDevice.Viewport.Width, graphicsDevice.Viewport.Height - (difference * 2));
             }
 
-            mPos.X = MathHelper.Clamp(mPos.X, viewport.Left, viewport.Right);
-            mPos.Y = MathHelper.Clamp(mPos.Y, viewport.Top, viewport.Bottom);
+            mPos.x = MathHelper.Clamp(mPos.x, viewport.Left, viewport.Right);
+            mPos.y = MathHelper.Clamp(mPos.y, viewport.Top, viewport.Bottom);
 
-            Mouse.SetPosition((int)mPos.X, (int)mPos.Y);
+            Mouse.SetPosition((int)mPos.x, (int)mPos.y);
         }
 
         private void HandleCoroutine(IEnumerator coroutine, bool isAtEndOfFrame)
@@ -262,6 +263,11 @@ namespace CrimsonEngine
 
             Coroutines = new List<IEnumerator>(shouldRunNextFrame);
 
+            if(clampMouseToWindow)
+            {
+                ClampMouseToWindow();
+            }
+
             foreach (GameObject go in GameObjects)
             {
                 if (go.isActive)
@@ -291,7 +297,7 @@ namespace CrimsonEngine
             {
                 int j = i;
 
-                while((j > 0) && (GameObjects[j].Transform.GlobalPosition.Z > GameObjects[j - 1].Transform.GlobalPosition.Z))
+                while((j > 0) && (GameObjects[j].Transform.GlobalPosition.z > GameObjects[j - 1].Transform.GlobalPosition.z))
                 {
                     int k = j - 1;
                     temp = GameObjects[k];
@@ -304,7 +310,7 @@ namespace CrimsonEngine
 
         private bool shouldDraw(GameObject go)
         {
-            return go.isActive && (go.Transform.GlobalPosition.Z >= Camera2D.main.Transform.GlobalPosition.Z);
+            return go.isActive && (go.Transform.GlobalPosition.z >= Camera2D.main.Transform.GlobalPosition.z);
         }
 
         private int numFixedUpdates = 0;
@@ -344,11 +350,11 @@ namespace CrimsonEngine
             spriteBatch.End();
 
             graphicsDevice.SetRenderTarget(depthRenderTarget);
-            graphicsDevice.Clear(Color.White);
+            graphicsDevice.Clear(Color.white);
 
             // first, find the total depth range of the thing
-            float minDepth = Camera2D.main.Transform.GlobalPosition.Z;
-            float maxDepth = GameObjects[0].Transform.GlobalPosition.Z;
+            float minDepth = Camera2D.main.Transform.GlobalPosition.z;
+            float maxDepth = GameObjects[0].Transform.GlobalPosition.z;
             float depthRange = maxDepth - minDepth;
             if (depthRange == 0)
                 depthRange = 1;
@@ -361,13 +367,13 @@ namespace CrimsonEngine
             {
                 if(shouldDraw(go))
                 {
-                    if(currentDepth != go.Transform.GlobalPosition.Z)
+                    if(currentDepth != go.Transform.GlobalPosition.z)
                     {
-                        currentDepth = go.Transform.GlobalPosition.Z;
+                        currentDepth = go.Transform.GlobalPosition.z;
                         spriteBatch.End();
                         spriteBatch.Begin(effect: depthMap, transformMatrix: Camera2D.main.TranslationMatrix, samplerState: SamplerState.PointClamp, blendState: BlendState.AlphaBlend, sortMode: SpriteSortMode.BackToFront);
                     }
-                    float depthValue = (((go.Transform.GlobalPosition.Z - minDepth) / depthRange) * 0.8f);
+                    float depthValue = (((go.Transform.GlobalPosition.z - minDepth) / depthRange) * 0.8f);
                     depthMap.Parameters["depth"].SetValue(depthValue);
                     depthMap.CurrentTechnique.Passes[0].Apply();
                     go.DrawDiffuse(spriteBatch, gameTime);
@@ -377,7 +383,7 @@ namespace CrimsonEngine
 
             graphicsDevice.SetRenderTarget(null);
 
-            graphicsDevice.Clear(Color.Black);
+            graphicsDevice.Clear(Color.black);
 
             /*
             spriteBatch.Begin(samplerState: SamplerState.PointClamp);
@@ -402,11 +408,11 @@ namespace CrimsonEngine
                         defaultLit.Parameters["DiffuseLightDirection"].SetValue(new Vector3((float)Math.Cos(gameTime.TotalGameTime.TotalSeconds), (float)Math.Sin(gameTime.TotalGameTime.TotalSeconds), 15));
                         defaultLit.Parameters["DiffuseIntensity"].SetValue(0f);
                         Vector3 lightScreenLoc = go.Transform.GlobalPosition;
-                        lightScreenLoc.Y *= -1;
+                        lightScreenLoc.y *= -1;
                         lightScreenLoc = Camera2D.main.WorldToScreen(lightScreenLoc);
-                        lightScreenLoc.Z = go.Transform.GlobalPosition.Z;
+                        lightScreenLoc.z = go.Transform.GlobalPosition.z;
                         defaultLit.Parameters["LightLocationScreen"].SetValue(lightScreenLoc);
-                        defaultLit.Parameters["LightColor"].SetValue(l.Color.ToVector4());
+                        defaultLit.Parameters["LightColor"].SetValue(((Microsoft.Xna.Framework.Color)l.Color).ToVector4());
                         defaultLit.Parameters["LightIntensity"].SetValue(l.Intensity);
                         defaultLit.Parameters["LightRange"].SetValue(l.Range * Camera2D.main.Zoom);
 
@@ -414,10 +420,10 @@ namespace CrimsonEngine
                         defaultLit.Parameters["LightRotation"].SetValue((l.Rotation + 180) / 180f * (float)Math.PI);
                         defaultLit.Parameters["LightConeAngle"].SetValue(l.ConeAngle / 180f * (float)Math.PI);
                         defaultLit.Parameters["LightPenumbraAngle"].SetValue(l.PenumbraAngle / 180f * (float)Math.PI);
-                        defaultLit.Parameters["BackgroundColor"].SetValue(backgroundColor.ToVector4());
+                        defaultLit.Parameters["BackgroundColor"].SetValue(((Microsoft.Xna.Framework.Color)backgroundColor).ToVector4());
                         
                         defaultLit.CurrentTechnique.Passes[0].Apply();
-                        spriteBatch.Draw(diffuseRenderTarget, new Rectangle(0, 0, graphicsDevice.Viewport.Width, graphicsDevice.Viewport.Height), Color.White);
+                        spriteBatch.Draw(diffuseRenderTarget, new Rectangle(0, 0, graphicsDevice.Viewport.Width, graphicsDevice.Viewport.Height), Color.white);
                         spriteBatch.End();
                     }
                 }
@@ -429,37 +435,34 @@ namespace CrimsonEngine
         {
             DrawScene(spriteBatch, gameTime);
 
-            float aspectRatio = InternalResolution.X / InternalResolution.Y;
+            float aspectRatio = InternalResolution.x / InternalResolution.y;
 
-            using (Texture2D whiteRectangle = new Texture2D(graphicsDevice, 1, 1))
+            Texture2D whiteRectangle = ResourceManager.GetResource<Texture2D>("Pixel");
+
+           spriteBatch.Begin();
+
+            float actualAspectRatio = (float)graphicsDevice.Viewport.Width / (float)graphicsDevice.Viewport.Height;
+            if (actualAspectRatio > aspectRatio)
             {
-                whiteRectangle.SetData(new[] { Color.White });
+                // the viewport is wider than the actual view
+                // so we should pillarbox
 
-                spriteBatch.Begin();
-
-                float actualAspectRatio = (float)graphicsDevice.Viewport.Width / (float)graphicsDevice.Viewport.Height;
-                if (actualAspectRatio > aspectRatio)
-                {
-                    // the viewport is wider than the actual view
-                    // so we should pillarbox
-
-                    int sub = (int)Math.Round(graphicsDevice.Viewport.Height * aspectRatio);
-                    int difference = (graphicsDevice.Viewport.Width - sub) / 2;
-                    spriteBatch.Draw(whiteRectangle, new Rectangle(0, 0, difference, graphicsDevice.Viewport.Height), Color.Black);
-                    spriteBatch.Draw(whiteRectangle, new Rectangle(graphicsDevice.Viewport.Width - difference, 0, difference, graphicsDevice.Viewport.Height), Color.Black);
-                }
-                else if (actualAspectRatio < aspectRatio)
-                {
-                    // we should letterbox
-
-                    int sub = (int)Math.Round(graphicsDevice.Viewport.Width / aspectRatio);
-                    int difference = (graphicsDevice.Viewport.Height - sub) / 2;
-                    spriteBatch.Draw(whiteRectangle, new Rectangle(0, 0, graphicsDevice.Viewport.Width, difference), Color.Black);
-                    spriteBatch.Draw(whiteRectangle, new Rectangle(0, graphicsDevice.Viewport.Height - difference, graphicsDevice.Viewport.Width, difference), Color.Black);
-                }
-
-                spriteBatch.End();
+                int sub = (int)Math.Round(graphicsDevice.Viewport.Height * aspectRatio);
+                int difference = (graphicsDevice.Viewport.Width - sub) / 2;
+                spriteBatch.Draw(whiteRectangle, new Rectangle(0, 0, difference, graphicsDevice.Viewport.Height), Color.black);
+                spriteBatch.Draw(whiteRectangle, new Rectangle(graphicsDevice.Viewport.Width - difference, 0, difference, graphicsDevice.Viewport.Height), Color.black);
             }
+            else if (actualAspectRatio < aspectRatio)
+            {
+                // we should letterbox
+
+                int sub = (int)Math.Round(graphicsDevice.Viewport.Width / aspectRatio);
+                int difference = (graphicsDevice.Viewport.Height - sub) / 2;
+                spriteBatch.Draw(whiteRectangle, new Rectangle(0, 0, graphicsDevice.Viewport.Width, difference), Color.black);
+                spriteBatch.Draw(whiteRectangle, new Rectangle(0, graphicsDevice.Viewport.Height - difference, graphicsDevice.Viewport.Width, difference), Color.black);
+            }
+
+            spriteBatch.End();
 
             Debug.Draw(spriteBatch, gameTime);
 
@@ -480,7 +483,7 @@ namespace CrimsonEngine
                 var fps = string.Format("FPS: {0}\nDelta Time: {1}\nFixed Updates Per Frame: {2}", averageFramesPerSecond, Time.deltaTime, numFixedUpdates);
 
                 spriteBatch.Begin();
-                spriteBatch.DrawString(ResourceManager.GetResource<SpriteFont>("Debug Font"), fps, new Vector2(10, 10), Color.White);
+                spriteBatch.DrawString(ResourceManager.GetResource<SpriteFont>("Debug Font"), fps, new Vector2(10, 10), Color.white);
                 spriteBatch.End();
             }
         }

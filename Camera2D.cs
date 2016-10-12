@@ -18,7 +18,7 @@ namespace CrimsonEngine
         {
             get
             {
-                return (SceneManager.CurrentScene.InternalResolution != Vector2.Zero ? SceneManager.CurrentScene.InternalResolution * 0.5f : new Vector2(SceneManager.CurrentScene.GraphicsDevice.Viewport.Width, SceneManager.CurrentScene.GraphicsDevice.Viewport.Height) * 0.5f);
+                return (SceneManager.CurrentScene.InternalResolution != Vector2.zero ? SceneManager.CurrentScene.InternalResolution * 0.5f : new Vector2(SceneManager.CurrentScene.GraphicsDevice.Viewport.Width, SceneManager.CurrentScene.GraphicsDevice.Viewport.Height) * 0.5f);
             }
         }
 
@@ -30,8 +30,8 @@ namespace CrimsonEngine
 
         public void ZoomToFit(int width, int height)
         {
-            float zoomW = (SceneManager.CurrentScene.InternalResolution != Vector2.Zero ? SceneManager.CurrentScene.InternalResolution.X : SceneManager.CurrentScene.GraphicsDevice.Viewport.Width) / (float)width;
-            float zoomH = (SceneManager.CurrentScene.InternalResolution != Vector2.Zero ? SceneManager.CurrentScene.InternalResolution.Y : SceneManager.CurrentScene.GraphicsDevice.Viewport.Height) / (float)height;
+            float zoomW = (SceneManager.CurrentScene.InternalResolution != Vector2.zero ? SceneManager.CurrentScene.InternalResolution.x : SceneManager.CurrentScene.GraphicsDevice.Viewport.Width) / (float)width;
+            float zoomH = (SceneManager.CurrentScene.InternalResolution != Vector2.zero ? SceneManager.CurrentScene.InternalResolution.y : SceneManager.CurrentScene.GraphicsDevice.Viewport.Height) / (float)height;
 
             Zoom = Math.Min(zoomW, zoomH);
         }
@@ -40,10 +40,10 @@ namespace CrimsonEngine
         {
             get
             {
-                return Matrix.CreateTranslation(-(int)Transform.GlobalPosition.X, -(int)Transform.GlobalPosition.Y, 0) *
+                return Matrix.CreateTranslation(-(int)Transform.GlobalPosition.x, -(int)Transform.GlobalPosition.y, 0) *
                        Matrix.CreateRotationZ(MathHelper.ToRadians(Transform.GlobalRotation)) *
                        Matrix.CreateScale(new Vector3(Zoom, Zoom, 1)) *
-                       Matrix.CreateTranslation(new Vector3(ViewportCenter, 0));
+                       Matrix.CreateTranslation((Vector3)ViewportCenter);
             }
         }
 
@@ -53,28 +53,28 @@ namespace CrimsonEngine
             {
                 Vector2 viewportCorner = ScreenToWorld(new Vector2(0, 0));
                 Vector2 viewportBottomCorner = ScreenToWorld(SceneManager.CurrentScene.InternalResolution);
-                return new Rectangle((int)viewportCorner.X, (int)viewportCorner.Y,
-                    (int)(viewportBottomCorner.X - viewportCorner.X),
-                    (int)(viewportBottomCorner.Y - viewportCorner.Y));
+                return new Rectangle((int)viewportCorner.x, (int)viewportCorner.y,
+                    (int)(viewportBottomCorner.x - viewportCorner.x),
+                    (int)(viewportBottomCorner.y - viewportCorner.y));
             }
         }
 
         public Vector2 WorldToScreen(Vector2 worldPosition)
         {
             Vector2 result = Vector2.Transform(worldPosition, TranslationMatrix);
-            result.Y *= -1;
+            result.y *= -1;
             return result;
         }
 
         public Vector2 ScreenToWorld(Vector2 screenPosition)
         {
-            if(SceneManager.CurrentScene.InternalResolution != Vector2.Zero)
+            if(SceneManager.CurrentScene.InternalResolution != Vector2.zero)
             {
-                screenPosition.X *= SceneManager.CurrentScene.InternalResolution.X / SceneManager.CurrentScene.GraphicsDevice.Viewport.Width;
-                screenPosition.Y *= SceneManager.CurrentScene.InternalResolution.Y / SceneManager.CurrentScene.GraphicsDevice.Viewport.Height;
+                screenPosition.x *= SceneManager.CurrentScene.InternalResolution.x / SceneManager.CurrentScene.GraphicsDevice.Viewport.Width;
+                screenPosition.y *= SceneManager.CurrentScene.InternalResolution.y / SceneManager.CurrentScene.GraphicsDevice.Viewport.Height;
             }
             Vector2 result = Vector2.Transform(screenPosition, Matrix.Invert(TranslationMatrix));
-            result.Y *= -1;
+            result.y *= -1;
             return result;
         }
 

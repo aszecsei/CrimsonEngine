@@ -53,6 +53,7 @@
   <ItemGroup>
     <Compile Include="AnimationCurve.cs" />
     <Compile Include="Camera2D.cs" />
+    <Compile Include="Color.cs" />
     <Compile Include="Component.cs" />
     <Compile Include="Coroutine.cs" />
     <Compile Include="Debug.cs" />
@@ -79,6 +80,8 @@
     <Compile Include="SpriteRenderer.cs" />
     <Compile Include="Time.cs" />
     <Compile Include="Transform.cs" />
+    <Compile Include="Vector2.cs" />
+    <Compile Include="Vector3.cs" />
     <Compile Include="VectorExtensions.cs" />
     <Compile Include="WaitForEndOfFrame.cs" />
     <Compile Include="WaitForFixedUpdate.cs" />

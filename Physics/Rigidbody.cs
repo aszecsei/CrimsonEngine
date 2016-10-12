@@ -256,8 +256,8 @@ namespace CrimsonEngine.Physics
             {
                 body.Position = value * Physics2D.pixelToUnit;
                 Vector3 p = GameObject.Transform.GlobalPosition;
-                p.X = value.X;
-                p.Y = value.Y;
+                p.x = value.y;
+                p.y = value.y;
                 GameObject.Transform.GlobalPosition = p;
             }
         }
@@ -610,9 +610,10 @@ namespace CrimsonEngine.Physics
         /// <returns>Whether the point overlapped any of the Rigidbody colliders.</returns>
         public bool OverlapPoint(Vector2 point)
         {
-            foreach(FarseerPhysics.Dynamics.Fixture f in body.FixtureList)
+            Microsoft.Xna.Framework.Vector2 p = point;
+            foreach(Fixture f in body.FixtureList)
             {
-                if (f.TestPoint(ref point))
+                if (f.TestPoint(ref p))
                     return true;
             }
             return false;
@@ -644,7 +645,7 @@ namespace CrimsonEngine.Physics
 
         public void AddBoxCollider(Vector2 offset, Vector2 size, float density)
         {
-            PolygonShape ps = new PolygonShape(PolygonTools.CreateRectangle(size.X * Physics2D.pixelToUnit / 2, size.Y * Physics2D.pixelToUnit / 2, offset * Physics2D.pixelToUnit, 0), density);
+            PolygonShape ps = new PolygonShape(PolygonTools.CreateRectangle(size.x * Physics2D.pixelToUnit / 2, size.x * Physics2D.pixelToUnit / 2, offset * Physics2D.pixelToUnit, 0), density);
             body.CreateFixture(ps);
         }
 
@@ -660,12 +661,12 @@ namespace CrimsonEngine.Physics
             base.Initialize();
 
             body = FarseerPhysics.Factories.BodyFactory.CreateBody(Physics2D.world);
-            Vector2 pos = Helpers.extractFromVector3(GameObject.Transform.GlobalPosition);
-            pos.X = pos.X * Physics2D.pixelToUnit;
-            pos.Y = pos.Y * Physics2D.pixelToUnit;
+            Vector2 pos = GameObject.Transform.GlobalPosition;
+            pos.x = pos.x * Physics2D.pixelToUnit;
+            pos.y = pos.y * Physics2D.pixelToUnit;
             body.Position = pos;
             body.Rotation = GameObject.Transform.GlobalRotation;
-            body.BodyType = FarseerPhysics.Dynamics.BodyType.Dynamic;
+            body.BodyType = BodyType.Dynamic;
             
             if (sleepMode == RigidbodySleepMode.StartAsleep)
             {
@@ -688,19 +689,20 @@ namespace CrimsonEngine.Physics
 
         public override void Update()
         {
+            body.Position = ((Microsoft.Xna.Framework.Vector2)((Vector2)transform.GlobalPosition)) * Physics2D.pixelToUnit;
 
-            Color c = Color.White;
+            Color c = Color.white;
             int lw = 1;
 
             if(!isStatic)
             {
                 if(IsAwake())
                 {
-                    c = Color.Green;
+                    c = Color.green;
                 }
                 else
                 {
-                    c = Color.Blue;
+                    c = Color.blue;
                 }
             }
             foreach(Fixture f in body.FixtureList)
@@ -708,7 +710,7 @@ namespace CrimsonEngine.Physics
                 if(f.Shape is CircleShape)
                 {
                     CircleShape cs = (f.Shape as CircleShape);
-                    Debug.DrawDebugCircle(position + (cs.Position * Physics2D.unitToPixel), cs.Radius * Physics2D.unitToPixel, c, lw);
+                    Debug.DrawDebugCircle(position + ((Vector2)cs.Position * Physics2D.unitToPixel), cs.Radius * Physics2D.unitToPixel, c, lw);
                 }
                 else if(f.Shape is PolygonShape)
                 {

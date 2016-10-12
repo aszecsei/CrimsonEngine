@@ -12,7 +12,7 @@ namespace CrimsonEngine.Physics
 {
     public static class Physics2D
     {
-        internal const float unitToPixel = 20f;
+        internal const float unitToPixel = 8f;
         internal const float pixelToUnit = 1 / unitToPixel;
 
         /// <summary>
@@ -47,22 +47,22 @@ namespace CrimsonEngine.Physics
         /// <summary>
         /// The color used by the debugger to show all asleep colliders (collider is asleep when the body is asleep).
         /// </summary>
-        public static Color colliderAsleepColor = Color.Blue;
+        public static Color colliderAsleepColor = Color.blue;
 
         /// <summary>
         /// The color used by the debugger to show all awake colliders (collider is awake when the body is awake).
         /// </summary>
-        public static Color colliderAwakeColor = Color.Green;
+        public static Color colliderAwakeColor = Color.green;
 
         /// <summary>
         /// The color used by the debugger to show all collider contacts.
         /// </summary>
-        public static Color colliderContactColor = Color.Red;
+        public static Color colliderContactColor = Color.red;
 
         /// <summary>
         /// The color used by the debugger to show all colliders without rigidbodies.
         /// </summary>
-        public static Color colliderNoRigidbodyColor = Color.White;
+        public static Color colliderNoRigidbodyColor = Color.white;
 
         /// <summary>
         /// Layer mask constant that includes all layers participating in raycasts by default.
@@ -474,7 +474,7 @@ namespace CrimsonEngine.Physics
         public static RaycastHit Raycast(Vector2 origin, Vector2 direction, float distance = float.MaxValue, PhysicsLayer layerMask = DefaultRaycastLayers, float minDepth = float.MinValue, float maxDepth = float.MaxValue)
         {
             RaycastHit rh = null;
-            Func<Fixture, Vector2, Vector2, float, float> get_first_callback = delegate (Fixture fixture, Vector2 point, Vector2 normal, float fraction)
+            Func<Fixture, Microsoft.Xna.Framework.Vector2, Microsoft.Xna.Framework.Vector2, float, float> get_first_callback = delegate (Fixture fixture, Microsoft.Xna.Framework.Vector2 point, Microsoft.Xna.Framework.Vector2 normal, float fraction)
             {
                 rh = new RaycastHit();
                 rh.centroid = origin;
@@ -495,14 +495,10 @@ namespace CrimsonEngine.Physics
                     }
                 }
                 rh.transform = rh.rigidbody.GameObject.Transform;
-                if (queriesStartInColliders || rh.distance > 0)
-                    return fraction;
-                else
-                    return 1;
-                    
+                return fraction;
             };
 
-            Vector2 point2 = new Vector2(direction.X, direction.Y);
+            Vector2 point2 = new Vector2(direction.x, direction.y);
             point2.Normalize();
             point2 *= distance;
             point2 += origin;
@@ -552,8 +548,8 @@ namespace CrimsonEngine.Physics
                 if(r != null)
                 {
                     Vector3 pos = go.Transform.GlobalPosition;
-                    pos.X = r.position.X;
-                    pos.Y = r.position.Y;
+                    pos.x = r.position.x;
+                    pos.y = r.position.y;
                     go.Transform.GlobalPosition = pos;
                 }
             }

@@ -30,7 +30,7 @@ namespace CrimsonEngine
         {
             get
             {
-                return new Vector2(1, 0);
+                return new Vector2(0, 1);
             }
         }
 
@@ -38,7 +38,7 @@ namespace CrimsonEngine
         {
             get
             {
-                return new Vector2(-1, 0);
+                return new Vector2(0, -1);
             }
         }
 
@@ -55,7 +55,7 @@ namespace CrimsonEngine
 
         public static Vector2 Normalized(Vector2 value)
         {
-            Vector2 v = new Vector2(value.X, value.Y);
+            Vector2 v = new Vector2(value.x, value.y);
             v.Normalize();
             return v;
         }
