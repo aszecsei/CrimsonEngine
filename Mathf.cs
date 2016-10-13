@@ -295,6 +295,21 @@ namespace CrimsonEngine
             return (float)Math.Sign(f);
         }
 
+        public static float SmoothDamp(float current, float target, ref float currentVelocity, float smoothTime, float deltaTime, float maxSpeed = Mathf.INFINITY)
+        {
+            float d = current;
+            float c = currentVelocity;
+            float b = (3f * target - 2 * currentVelocity * smoothTime - 3 * current) / (-1f * Mathf.Pow(smoothTime));
+            float a = (2 * target - currentVelocity * smoothTime - 2 * current) / (-1f * Mathf.Pow(smoothTime, 3));
+
+            float posNext = a * Mathf.Pow(deltaTime, 3) + b * Mathf.Pow(deltaTime) + c * deltaTime + d;
+            posNext = Mathf.Min(current + maxSpeed * deltaTime, posNext);
+            float vNext = 3 * a * Mathf.Pow(deltaTime) + 2 * b * deltaTime + c;
+            vNext = Mathf.Min(maxSpeed, vNext);
+            currentVelocity = vNext;
+            return posNext;
+        }
+
         public static float Sqrt(float f)
         {
             return (float)Math.Sqrt(f);

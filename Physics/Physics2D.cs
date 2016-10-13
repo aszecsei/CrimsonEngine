@@ -542,17 +542,6 @@ namespace CrimsonEngine.Physics
         internal static void Simulate()
         {
             world.Step(Time.actualFixedDeltaTime);
-            foreach(GameObject go in SceneManager.CurrentScene.GameObjects)
-            {
-                Rigidbody r = go.GetComponent<Rigidbody>();
-                if(r != null)
-                {
-                    Vector3 pos = go.Transform.GlobalPosition;
-                    pos.x = r.position.x;
-                    pos.y = r.position.y;
-                    go.Transform.GlobalPosition = pos;
-                }
-            }
         }
     }
 }

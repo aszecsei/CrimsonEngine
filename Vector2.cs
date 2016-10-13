@@ -111,6 +111,19 @@ namespace CrimsonEngine
         #endregion
 
         #region Public Functions
+        public override bool Equals(object obj)
+        {
+            if (obj == null)
+                return false;
+
+            return ((Vector2)obj) == this;
+        }
+
+        public override int GetHashCode()
+        {
+            return _internal.GetHashCode();
+        }
+
         public void Normalize()
         {
             _internal.Normalize();
@@ -322,8 +335,12 @@ namespace CrimsonEngine
         /// <returns></returns>
         public static Vector2 SmoothDamp(Vector2 current, Vector2 target, ref Vector2 currentVelocity, float smoothTime, float deltaTime, float maxSpeed = Mathf.INFINITY)
         {
-            // TODO: Implement this
-            throw new NotImplementedException();
+            float ySpeed = currentVelocity.y;
+            float xSpeed = currentVelocity.x;
+            Vector2 result = new Vector2(Mathf.SmoothDamp(current.x, target.x, ref xSpeed, smoothTime, maxSpeed, deltaTime), Mathf.SmoothDamp(current.y, target.y, ref ySpeed, smoothTime, maxSpeed, deltaTime));
+            currentVelocity.x = xSpeed;
+            currentVelocity.y = ySpeed;
+            return result;
         }
 
         internal static Vector2 Transform(Vector2 value, Microsoft.Xna.Framework.Matrix matrix)

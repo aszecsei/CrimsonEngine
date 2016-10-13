@@ -82,7 +82,6 @@
     <Compile Include="Transform.cs" />
     <Compile Include="Vector2.cs" />
     <Compile Include="Vector3.cs" />
-    <Compile Include="VectorExtensions.cs" />
     <Compile Include="WaitForEndOfFrame.cs" />
     <Compile Include="WaitForFixedUpdate.cs" />
     <Compile Include="WaitForSeconds.cs" />

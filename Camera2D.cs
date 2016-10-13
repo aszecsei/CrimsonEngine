@@ -61,8 +61,8 @@ namespace CrimsonEngine
 
         public Vector2 WorldToScreen(Vector2 worldPosition)
         {
-            Vector2 result = Vector2.Transform(worldPosition, TranslationMatrix);
-            result.y *= -1;
+            Vector2 transformedWP = new Vector2(worldPosition.x, -1 * worldPosition.y);
+            Vector2 result = Vector2.Transform(transformedWP, TranslationMatrix);
             return result;
         }
 

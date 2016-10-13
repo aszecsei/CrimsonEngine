@@ -225,10 +225,27 @@ namespace CrimsonEngine
                     if (go.isActive)
                     {
                         go.FixedUpdate();
+                        Rigidbody r = go.GetComponent<Rigidbody>();
+                        if(r != null)
+                        {
+                            r.UpdateBodyPosition();
+                        }
                     }
                 }
 
                 Physics2D.Simulate();
+            }
+
+            foreach (GameObject go in GameObjects)
+            {
+                if (go.isActive)
+                {
+                    Rigidbody r = go.GetComponent<Rigidbody>();
+                    if (r != null)
+                    {
+                        r.UpdateTransform();
+                    }
+                }
             }
 
             List<IEnumerator> mFixed = new List<IEnumerator>(shouldRunAtFixedTimestep);

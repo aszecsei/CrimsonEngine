@@ -11,9 +11,12 @@ namespace CrimsonEngine
 {
     abstract class DebugShape
     {
-        protected virtual Texture2D BlankTexture()
+        protected Texture2D BlankTexture
         {
-            return ResourceManager.GetResource<Texture2D>("Pixel");
+            get
+            {
+                return ResourceManager.GetResource<Texture2D>("Pixel");
+            }
         }
 
         protected virtual void DrawPolygon(SpriteBatch spriteBatch, Vector2[] vertex, int count, Color color, int lineWidth)
@@ -34,9 +37,9 @@ namespace CrimsonEngine
             Vector2 screenFrom = Camera2D.main.WorldToScreen(from);
             Vector2 screenTo = Camera2D.main.WorldToScreen(to);
 
-            float angle = (float)Math.Atan2(screenFrom.y - screenTo.y, screenFrom.x - screenTo.y);
+            float angle = (float)Math.Atan2(screenFrom.y - screenTo.y, screenFrom.x - screenTo.x);
             float length = Vector2.Distance(screenFrom, screenTo);
-            spriteBatch.Draw(BlankTexture(), screenTo, null, color, angle, Vector2.zero, new Vector2(length, lineWidth), SpriteEffects.None, 0f);
+            spriteBatch.Draw(BlankTexture, screenTo, null, color, angle, Vector2.zero, new Vector2(length, lineWidth), SpriteEffects.None, 0f);
         }
 
         public abstract void Draw(SpriteBatch spriteBatch, GameTime gameTime);

@@ -20,8 +20,11 @@ namespace CrimsonEngine.Physics
             get
             {
                 FarseerPhysics.Collision.AABB result = new FarseerPhysics.Collision.AABB();
-                result.LowerBound = new Vector2(float.MaxValue, float.MaxValue);
-                result.UpperBound = new Vector2(float.MinValue, float.MinValue);
+                bool assigned = false;
+
+                FarseerPhysics.Common.Transform bTransform;
+                body.GetTransform(out bTransform);
+
                 List<Fixture> fixList = body.FixtureList;
                 foreach(Fixture f in fixList)
                 {
@@ -29,8 +32,16 @@ namespace CrimsonEngine.Physics
                     int childCount = f.Shape.ChildCount;
                     for(int child = 0; child < childCount; ++child)
                     {
-                        f.GetAABB(out fixAABB, child);
-                        result.Combine(ref result, ref fixAABB);
+                        f.Shape.ComputeAABB(out fixAABB, ref bTransform, child);
+                        if(!assigned)
+                        {
+                            result = fixAABB;
+                            assigned = true;
+                        }
+                        else
+                        {
+                            result.Combine(ref result, ref fixAABB);
+                        }
                     }
                 }
 
@@ -42,7 +53,7 @@ namespace CrimsonEngine.Physics
         {
             get
             {
-                return new Bounds(AABB.Center * Physics2D.unitToPixel, new Vector2(AABB.Width * Physics2D.unitToPixel, AABB.Height * Physics2D.unitToPixel));
+                return new Bounds((Vector2)(AABB.Center * Physics2D.unitToPixel), new Vector2(AABB.Width * Physics2D.unitToPixel, AABB.Height * Physics2D.unitToPixel));
             }
         }
 
@@ -256,7 +267,7 @@ namespace CrimsonEngine.Physics
             {
                 body.Position = value * Physics2D.pixelToUnit;
                 Vector3 p = GameObject.Transform.GlobalPosition;
-                p.x = value.y;
+                p.x = value.x;
                 p.y = value.y;
                 GameObject.Transform.GlobalPosition = p;
             }
@@ -645,7 +656,7 @@ namespace CrimsonEngine.Physics
 
         public void AddBoxCollider(Vector2 offset, Vector2 size, float density)
         {
-            PolygonShape ps = new PolygonShape(PolygonTools.CreateRectangle(size.x * Physics2D.pixelToUnit / 2, size.x * Physics2D.pixelToUnit / 2, offset * Physics2D.pixelToUnit, 0), density);
+            PolygonShape ps = new PolygonShape(PolygonTools.CreateRectangle(size.x * Physics2D.pixelToUnit / 2, size.y * Physics2D.pixelToUnit / 2, offset * Physics2D.pixelToUnit, 0), density);
             body.CreateFixture(ps);
         }
 
@@ -687,10 +698,20 @@ namespace CrimsonEngine.Physics
             }
         }
 
+        public void UpdateBodyPosition()
+        {
+            position = (Vector2)transform.GlobalPosition;
+            rotation = transform.GlobalRotation;
+        }
+
+        public void UpdateTransform()
+        {
+            transform.GlobalPosition = new Vector3(position.x, position.y, transform.GlobalPosition.z);
+            transform.GlobalRotation = body.Rotation;
+        }
+
         public override void Update()
         {
-            body.Position = ((Microsoft.Xna.Framework.Vector2)((Vector2)transform.GlobalPosition)) * Physics2D.pixelToUnit;
-
             Color c = Color.white;
             int lw = 1;
 
@@ -725,6 +746,9 @@ namespace CrimsonEngine.Physics
                     Debug.DrawDebugPolygon(verts, c, lw);
                 }
             }
+
+            Debug.DrawDebugLine(position - Vector2.up, position + Vector2.up, c, lw);
+            Debug.DrawDebugLine(position - Vector2.right, position + Vector2.right, c, lw);
         }
     }
 }

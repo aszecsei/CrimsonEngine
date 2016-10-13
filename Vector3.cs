@@ -127,6 +127,19 @@ namespace CrimsonEngine
         #endregion
 
         #region Public Functions
+        public override bool Equals(object obj)
+        {
+            if (obj == null)
+                return false;
+
+            return ((Vector3)obj) == this;
+        }
+
+        public override int GetHashCode()
+        {
+            return _internal.GetHashCode();
+        }
+
         public void Normalize()
         {
             _internal.Normalize();
@@ -311,7 +324,9 @@ namespace CrimsonEngine
         /// <param name="tangent"></param>
         public static void OrthoNormalize(ref Vector3 normal, ref Vector3 tangent)
         {
-
+            tangent -= Vector3.Project(tangent, normal);
+            normal.Normalize();
+            tangent.Normalize();
         }
 
         /// <summary>
@@ -336,8 +351,12 @@ namespace CrimsonEngine
         /// <param name="binormal"></param>
         public static void OrthoNormalize(ref Vector3 normal, ref Vector3 tangent, ref Vector3 binormal)
         {
-            // TODO: Implement this.
-            throw new NotImplementedException();
+            tangent -= Vector3.Project(tangent, normal);
+            binormal -= Vector3.Project(binormal, normal);
+            binormal -= Vector3.Project(binormal, tangent);
+            normal.Normalize();
+            tangent.Normalize();
+            binormal.Normalize();
         }
 
         /// <summary>
@@ -357,8 +376,10 @@ namespace CrimsonEngine
         /// <returns></returns>
         public static Vector3 Project(Vector3 vector, Vector3 onNormal)
         {
-            // TODO: Implement this
-            throw new NotImplementedException();
+            if (onNormal == Vector3.zero)
+                return Vector3.zero;
+
+            return Vector3.Dot(vector, onNormal) * onNormal / onNormal.sqrMagnitude;
         }
 
         /// <summary>
@@ -369,8 +390,30 @@ namespace CrimsonEngine
         /// <returns></returns>
         public static Vector3 ProjectOnPlane(Vector3 vector, Vector3 planeNormal)
         {
-            // TODO: Implement this
-            throw new NotImplementedException();
+            if (planeNormal == Vector3.zero)
+                throw new Exception("The zero vector cannot be used to define a plane. Take a linear algebra course.");
+
+            // Generate a basis
+            Vector3 b1 = Vector3.zero;
+            Vector3 b2 = Vector3.zero;
+            if (!Mathf.Approximately(planeNormal.x, 0f))
+            {
+                b1 = new Vector3(-1f * planeNormal.y, planeNormal.x, 0f);
+                b2 = new Vector3(-1f * planeNormal.z, 0f, planeNormal.x);
+                b2 -= Vector3.Project(b2, b1);
+            }
+            else if(!Mathf.Approximately(planeNormal.y, 0f))
+            {
+                b1 = new Vector3(1, 0, 0);
+                b2 = new Vector3(0, -planeNormal.z, planeNormal.y);
+            }
+            else if(!Mathf.Approximately(planeNormal.z, 0f))
+            {
+                b1 = new Vector3(1, 0, 0);
+                b2 = new Vector3(0, 1, 0);
+            }
+
+            return Vector3.Project(vector, b1) + Vector3.Project(vector, b2);
         }
 
         /// <summary>
@@ -473,8 +516,14 @@ namespace CrimsonEngine
         /// <returns></returns>
         public static Vector3 SmoothDamp(Vector3 current, Vector3 target, ref Vector3 currentVelocity, float smoothTime, float deltaTime, float maxSpeed = Mathf.INFINITY)
         {
-            // TODO: Implement this
-            throw new NotImplementedException();
+            float ySpeed = currentVelocity.y;
+            float xSpeed = currentVelocity.x;
+            float zSpeed = currentVelocity.z;
+            Vector3 result = new Vector3(Mathf.SmoothDamp(current.x, target.x, ref xSpeed, smoothTime, maxSpeed, deltaTime), Mathf.SmoothDamp(current.y, target.y, ref ySpeed, smoothTime, maxSpeed, deltaTime), Mathf.SmoothDamp(current.z, target.z, ref zSpeed, smoothTime, maxSpeed, deltaTime));
+            currentVelocity.x = xSpeed;
+            currentVelocity.y = ySpeed;
+            currentVelocity.z = zSpeed;
+            return result;
         }
 
         internal static Vector3 Transform(Vector3 value, Microsoft.Xna.Framework.Matrix matrix)
