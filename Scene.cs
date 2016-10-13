@@ -424,11 +424,10 @@ namespace CrimsonEngine
                         defaultLit.Parameters["DepthRange"].SetValue(depthRange);
                         defaultLit.Parameters["DiffuseLightDirection"].SetValue(new Vector3((float)Math.Cos(gameTime.TotalGameTime.TotalSeconds), (float)Math.Sin(gameTime.TotalGameTime.TotalSeconds), 15));
                         defaultLit.Parameters["DiffuseIntensity"].SetValue(0f);
-                        Vector3 lightScreenLoc = go.Transform.GlobalPosition;
-                        lightScreenLoc.y *= -1;
+                        Vector2 lightScreenLoc = new Vector2(go.Transform.GlobalPosition.x, go.Transform.GlobalPosition.y);
                         lightScreenLoc = Camera2D.main.WorldToScreen(lightScreenLoc);
-                        lightScreenLoc.z = go.Transform.GlobalPosition.z;
-                        defaultLit.Parameters["LightLocationScreen"].SetValue(lightScreenLoc);
+                        Vector3 ls3 = new Vector3(lightScreenLoc.x, lightScreenLoc.y, go.Transform.GlobalPosition.z);
+                        defaultLit.Parameters["LightLocationScreen"].SetValue(ls3);
                         defaultLit.Parameters["LightColor"].SetValue(((Microsoft.Xna.Framework.Color)l.Color).ToVector4());
                         defaultLit.Parameters["LightIntensity"].SetValue(l.Intensity);
                         defaultLit.Parameters["LightRange"].SetValue(l.Range * Camera2D.main.Zoom);
