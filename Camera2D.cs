@@ -22,10 +22,10 @@ namespace CrimsonEngine
             }
         }
 
-        public Camera2D()
+        public Camera2D() : base()
         {
             Zoom = 1.0f;
-            Transform.GlobalPosition = new Vector3(0, 0, -1);
+            transform.GlobalPosition = new Vector3(0, 0, -1);
         }
 
         public void ZoomToFit(int width, int height)
@@ -40,8 +40,8 @@ namespace CrimsonEngine
         {
             get
             {
-                return Matrix.CreateTranslation(-(int)Transform.GlobalPosition.x, -(int)Transform.GlobalPosition.y, 0) *
-                       Matrix.CreateRotationZ(MathHelper.ToRadians(Transform.GlobalRotation)) *
+                return Matrix.CreateTranslation(-(int)transform.GlobalPosition.x, -(int)transform.GlobalPosition.y, 0) *
+                       Matrix.CreateRotationZ(MathHelper.ToRadians(transform.GlobalRotation)) *
                        Matrix.CreateScale(new Vector3(Zoom, Zoom, 1)) *
                        Matrix.CreateTranslation((Vector3)ViewportCenter);
             }

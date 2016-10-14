@@ -266,10 +266,10 @@ namespace CrimsonEngine.Physics
             set
             {
                 body.Position = value * Physics2D.pixelToUnit;
-                Vector3 p = GameObject.Transform.GlobalPosition;
+                Vector3 p = GameObject.transform.GlobalPosition;
                 p.x = value.x;
                 p.y = value.y;
-                GameObject.Transform.GlobalPosition = p;
+                GameObject.transform.GlobalPosition = p;
             }
         }
 
@@ -285,7 +285,7 @@ namespace CrimsonEngine.Physics
             set
             {
                 body.Rotation = value;
-                GameObject.Transform.GlobalRotation = value;
+                GameObject.transform.GlobalRotation = value;
             }
         }
 
@@ -667,16 +667,14 @@ namespace CrimsonEngine.Physics
             body.CreateFixture(cs);
         }
 
-        public override void Initialize()
+        void Awake()
         {
-            base.Initialize();
-
             body = FarseerPhysics.Factories.BodyFactory.CreateBody(Physics2D.world);
-            Vector2 pos = GameObject.Transform.GlobalPosition;
+            Vector2 pos = GameObject.transform.GlobalPosition;
             pos.x = pos.x * Physics2D.pixelToUnit;
             pos.y = pos.y * Physics2D.pixelToUnit;
             body.Position = pos;
-            body.Rotation = GameObject.Transform.GlobalRotation;
+            body.Rotation = GameObject.transform.GlobalRotation;
             body.BodyType = BodyType.Dynamic;
             
             if (sleepMode == RigidbodySleepMode.StartAsleep)
@@ -710,7 +708,7 @@ namespace CrimsonEngine.Physics
             transform.GlobalRotation = body.Rotation;
         }
 
-        public override void Update()
+        void Update()
         {
             Color c = Color.white;
             int lw = 1;

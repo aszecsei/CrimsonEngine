@@ -483,7 +483,7 @@ namespace CrimsonEngine.Physics
                 rh.fraction = fraction * unitToPixel;
                 rh.normal = normal * unitToPixel;
                 rh.point = point * unitToPixel;
-                foreach(GameObject go in SceneManager.CurrentScene.GameObjects)
+                foreach(GameObject go in SceneManager.CurrentScene.ActiveGameObjects)
                 {
                     Rigidbody r = go.GetComponent<Rigidbody>();
                     if (r != null)
@@ -494,7 +494,7 @@ namespace CrimsonEngine.Physics
                         }
                     }
                 }
-                rh.transform = rh.rigidbody.GameObject.Transform;
+                rh.transform = rh.rigidbody.GameObject.transform;
                 return fraction;
             };
 

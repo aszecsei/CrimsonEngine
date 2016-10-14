@@ -41,11 +41,11 @@ namespace CrimsonEngine
             if(Diffuse  != null)
             {
                 spriteBatch.Draw(texture: Diffuse, 
-                    position: new Vector2(GameObject.Transform.GlobalPosition.x, -GameObject.Transform.GlobalPosition.y), 
+                    position: new Vector2(GameObject.transform.GlobalPosition.x, -GameObject.transform.GlobalPosition.y), 
                     color: TintColor, 
-                    rotation: GameObject.Transform.GlobalRotation, 
+                    rotation: GameObject.transform.GlobalRotation, 
                     origin: Origin, 
-                    scale: new Vector2(GameObject.Transform.GlobalScale.x, GameObject.Transform.GlobalScale.y),
+                    scale: new Vector2(GameObject.transform.GlobalScale.x, GameObject.transform.GlobalScale.y),
                     effects:effect);
             }
             else
@@ -59,11 +59,11 @@ namespace CrimsonEngine
             if (Normal != null)
             {
                 spriteBatch.Draw(texture: Normal,
-                    position: new Vector2(GameObject.Transform.GlobalPosition.x, -GameObject.Transform.GlobalPosition.y),
+                    position: new Vector2(GameObject.transform.GlobalPosition.x, -GameObject.transform.GlobalPosition.y),
                     color: TintColor,
-                    rotation: GameObject.Transform.GlobalRotation,
+                    rotation: GameObject.transform.GlobalRotation,
                     origin: Origin,
-                    scale: new Vector2(GameObject.Transform.GlobalScale.x, GameObject.Transform.GlobalScale.y),
+                    scale: new Vector2(GameObject.transform.GlobalScale.x, GameObject.transform.GlobalScale.y),
                     effects:effect);
             }
             else
@@ -77,11 +77,11 @@ namespace CrimsonEngine
             if (Emissive != null)
             {
                 spriteBatch.Draw(texture: Emissive,
-                    position: new Vector2(GameObject.Transform.GlobalPosition.x, -GameObject.Transform.GlobalPosition.y),
+                    position: new Vector2(GameObject.transform.GlobalPosition.x, -GameObject.transform.GlobalPosition.y),
                     color: TintColor,
-                    rotation: GameObject.Transform.GlobalRotation,
+                    rotation: GameObject.transform.GlobalRotation,
                     origin: Origin,
-                    scale: new Vector2(GameObject.Transform.GlobalScale.x, GameObject.Transform.GlobalScale.y),
+                    scale: new Vector2(GameObject.transform.GlobalScale.x, GameObject.transform.GlobalScale.y),
                     effects:effect);
             }
             else
@@ -95,11 +95,11 @@ namespace CrimsonEngine
             if (Specular != null)
             {
                 spriteBatch.Draw(texture: Specular,
-                    position: new Vector2(GameObject.Transform.GlobalPosition.x, -GameObject.Transform.GlobalPosition.y),
+                    position: new Vector2(GameObject.transform.GlobalPosition.x, -GameObject.transform.GlobalPosition.y),
                     color: TintColor,
-                    rotation: GameObject.Transform.GlobalRotation,
+                    rotation: GameObject.transform.GlobalRotation,
                     origin: Origin,
-                    scale: new Vector2(GameObject.Transform.GlobalScale.x, GameObject.Transform.GlobalScale.y),
+                    scale: new Vector2(GameObject.transform.GlobalScale.x, GameObject.transform.GlobalScale.y),
                     effects: effect);
             }
             else

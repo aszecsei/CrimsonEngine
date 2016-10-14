@@ -9,147 +9,66 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace CrimsonEngine
 {
-    public class GameObject
+    public class GameObject : Object
     {
-        internal void Awake()
-        {
-            foreach(Component c in Components.Values)
-            {
-                if(c.isActive)
-                {
-                    c.Awake();
-                }
-            }
-        }
-
+        #region Variables
         private Dictionary<Type, Component> Components;
 
-        public bool isActive = true;
-
-        public GameObject()
+        public bool activeInHierarchy
         {
-            Components = new Dictionary<Type, Component>();
-
-            // All GameObjects have a transform
-            AddComponent<Transform>();
-        }
-
-        public GameObject AddComponent<T>() where T : Component, new()
-        {
-            return AddComponent<T>(new T());
-        }
-
-        public GameObject AddComponent<T>(T component) where T : Component
-        {
-            component.GameObject = this;
-            Components[typeof(T)] = component;
-            (component as Component).Initialize();
-            return this;
-        }
-
-        public GameObject RemoveComponent<T>() where T : Component
-        {
-            Components.Remove(typeof(T));
-            return this;
-        }
-
-        public T GetComponent<T>() where T : Component
-        {
-            if (Components.ContainsKey(typeof(T)))
-                return (T)Components[typeof(T)];
-            else
-                return null;
-        }
-
-        public T GetComponentOrSubclass<T>() where T : Component
-        {
-            foreach(Type t in Components.Keys)
+            get
             {
-                if(Helpers.IsSameOrSubclass(typeof(T), t))
+                if (transform.Parent == null)
+                    return activeSelf;
+                else
+                    return activeSelf && transform.Parent.GameObject.activeInHierarchy;
+            }
+        }
+
+        private bool _activeSelf = true;
+
+        /// <summary>
+        /// The local active state of this GameObject. (Read Only)
+        /// </summary>
+        /// <remarks>
+        /// This returns the local active state of this GameObject, which is set using GameObject.SetActive. Note that a GameObject
+        /// may be inactive because a parent is not active, even if this returns true. This state will then be used once all parents
+        /// are active. Use GameObject.activeInHierarchy if you want to check if the GameObject is actually treated as active in the scene.
+        /// </remarks>
+        public bool activeSelf
+        {
+            get { return _activeSelf; }
+        }
+
+        public Physics.PhysicsLayer layer = Physics.PhysicsLayer.Layer1;
+
+        /// <summary>
+        /// The tag of this game object.
+        /// </summary>
+        private string _tag = null;
+        public string tag
+        {
+            get { return _tag; }
+            set
+            {
+                if(_tag != null)
                 {
-                    return (T)Components[t];
+                    List<GameObject> prevTagList = SceneManager.CurrentScene.taggedObjects[_tag];
+                    prevTagList.Remove(this);
+                    SceneManager.CurrentScene.taggedObjects[_tag] = prevTagList;
                 }
-            }
-            return null;
-        }
-
-        public void Update()
-        {
-            foreach (KeyValuePair<Type, Component> kvp in Components)
-            {
-                if(kvp.Value.isActive)
-                    kvp.Value.Update();
+                List<GameObject> newTagList;
+                if (SceneManager.CurrentScene.taggedObjects.ContainsKey(value))
+                    newTagList = SceneManager.CurrentScene.taggedObjects[value];
+                else
+                    newTagList = new List<GameObject>();
+                newTagList.Add(this);
+                SceneManager.CurrentScene.taggedObjects[value] = newTagList;
+                _tag = value;
             }
         }
 
-        public void FixedUpdate()
-        {
-            foreach (KeyValuePair<Type, Component> kvp in Components)
-            {
-                if (kvp.Value.isActive && !(kvp.Value is Physics.Rigidbody))
-                    kvp.Value.FixedUpdate();
-            }
-        }
-
-        public void PhysicsUpdate()
-        {
-            foreach (KeyValuePair<Type, Component> kvp in Components)
-            {
-                if (kvp.Value.isActive && (kvp.Value is Physics.Rigidbody))
-                    kvp.Value.FixedUpdate();
-            }
-        }
-
-        public void LateUpdate()
-        {
-            foreach (KeyValuePair<Type, Component> kvp in Components)
-            {
-                if (kvp.Value.isActive)
-                    kvp.Value.LateUpdate();
-            }
-        }
-
-        public void DrawDiffuse(SpriteBatch spriteBatch, GameTime gameTime)
-        {
-            var renderers = Components.Values.OfType<Renderer>();
-            foreach (Renderer r in renderers)
-            {
-                if(r.isActive)
-                    r.DrawDiffuse(spriteBatch, gameTime);
-            }
-        }
-
-        public void DrawNormal(SpriteBatch spriteBatch, GameTime gameTime)
-        {
-            var renderers = Components.Values.OfType<Renderer>();
-            foreach (Renderer r in renderers)
-            {
-                if (r.isActive)
-                    r.DrawNormal(spriteBatch, gameTime);
-            }
-        }
-
-        public void DrawSpecular(SpriteBatch spriteBatch, GameTime gameTime)
-        {
-            var renderers = Components.Values.OfType<Renderer>();
-            foreach (Renderer r in renderers)
-            {
-                if (r.isActive)
-                    r.DrawSpecular(spriteBatch, gameTime);
-            }
-        }
-
-        public void DrawEmissive(SpriteBatch spriteBatch, GameTime gameTime)
-        {
-            var renderers = Components.Values.OfType<Renderer>();
-            foreach (Renderer r in renderers)
-            {
-                if (r.isActive)
-                    r.DrawEmissive(spriteBatch, gameTime);
-            }
-        }
-
-        public Transform Transform
+        public Transform transform
         {
             get
             {
@@ -160,29 +79,40 @@ namespace CrimsonEngine
                 AddComponent<Transform>(value);
             }
         }
+        #endregion Variables
 
-        /// <summary>
-        /// Send a message to all components of a game object. Note that this will call functions on deactivated
-        /// components, so as to enable them to awaken in response to messages.
-        /// </summary>
-        /// <param name="name">The name of the function to call.</param>
-        /// <param name="parameterArray">The parameters of the function to call.</param>
-        public void SendMessage(String name, params object[] parameterArray)
+        #region Constructors
+        public GameObject()
         {
-            Type[] types = new Type[parameterArray.Length];
-            for(int i = 0; i < parameterArray.Length; i++)
-            {
-                types[0] = parameterArray[0].GetType();
-            }
+            Components = new Dictionary<Type, Component>();
+            this.name = "GameObject";
+            // All GameObjects have a transform
+            AddComponent<Transform>();
+            SceneManager.CurrentScene.InstantiatedGameObjects.Add(this);
+        }
 
-            foreach(Component c in Components.Values)
-            {
-                System.Reflection.MethodInfo mI = c.GetType().GetMethod(name, types);
-                if (mI != null)
-                {
-                    mI.Invoke(c, parameterArray);
-                }
-            }
+        public GameObject(string name)
+        {
+            Components = new Dictionary<Type, Component>();
+            this.name = name;
+
+            AddComponent<Transform>();
+            SceneManager.CurrentScene.InstantiatedGameObjects.Add(this);
+        }
+        #endregion
+
+        #region Public Functions
+        public T AddComponent<T>() where T : Component, new()
+        {
+            return AddComponent(new T());
+        }
+
+        public T AddComponent<T>(T component) where T : Component
+        {
+            component.GameObject = this;
+            Components[typeof(T)] = component;
+            component.Invoke("Awake");
+            return component;
         }
 
         /// <summary>
@@ -194,9 +124,42 @@ namespace CrimsonEngine
         {
             SendMessage(name, parameterArray);
 
-            foreach(Transform t in Transform.GetChildren())
+            foreach (Transform t in transform.GetChildren())
             {
                 t.GameObject.BroadcastMessage(name, parameterArray);
+            }
+        }
+
+        public bool CompareTag(string tag)
+        {
+            return tag.Equals(tag);
+        }
+
+        public T GetComponent<T>() where T : Component
+        {
+            if (Components.ContainsKey(typeof(T)))
+                return (T)Components[typeof(T)];
+            else
+                return null;
+        }
+
+        /// <summary>
+        /// Send a message to all components of a game object. Note that this will call functions on deactivated
+        /// components, so as to enable them to awaken in response to messages.
+        /// </summary>
+        /// <param name="name">The name of the function to call.</param>
+        /// <param name="parameterArray">The parameters of the function to call.</param>
+        public void SendMessage(String name, params object[] parameterArray)
+        {
+            Type[] types = new Type[parameterArray.Length];
+            for (int i = 0; i < parameterArray.Length; i++)
+            {
+                types[0] = parameterArray[0].GetType();
+            }
+
+            foreach (Component c in Components.Values)
+            {
+                c.Invoke(name, parameterArray);
             }
         }
 
@@ -208,27 +171,168 @@ namespace CrimsonEngine
         public void SendMessageUpwards(String name, params object[] parameterArray)
         {
             SendMessage(name, parameterArray);
-            if(Transform.Parent != null)
+            if (transform.Parent != null)
             {
-                Transform.Parent.GameObject.SendMessageUpwards(name, parameterArray);
+                transform.Parent.GameObject.SendMessageUpwards(name, parameterArray);
             }
         }
 
-        public void Destroy()
+        /// <summary>
+        /// Activates/Deactivates the GameObject.
+        /// </summary>
+        /// <remarks>
+        /// Note that a GameObject may be inactive because a parent is not active. In that case, calling SetActive() will not activate it,
+        /// but only set the local state of the GameObject, which can be checked using GameObject.activeSelf. This state will then be used
+        /// once all parents are active.
+        /// 
+        /// Making a GameObject inactive will disable every component, turning off any attached renderers, colliders, rigidbodies, scripts,
+        /// etc... Any scripts that you have attached to the GameObject will no longer have Update() called, for example.
+        /// </remarks>
+        /// <param name="value">Activate or deactivate the object.</param>
+        public void SetActive(bool value)
         {
-            SceneManager.CurrentScene.DestroyGameObject(this);
+            _activeSelf = value;
+        }
+        #endregion
+
+        #region Internal Functions
+        internal void DrawDiffuse(SpriteBatch spriteBatch, GameTime gameTime)
+        {
+            var renderers = Components.Values.OfType<Renderer>();
+            foreach (Renderer r in renderers)
+            {
+                if(r.enabled)
+                    r.DrawDiffuse(spriteBatch, gameTime);
+            }
         }
 
-        public void Instantiate(GameObject go)
+        internal void DrawNormal(SpriteBatch spriteBatch, GameTime gameTime)
         {
-            SceneManager.CurrentScene.InstantiateGameObject(go);
+            var renderers = Components.Values.OfType<Renderer>();
+            foreach (Renderer r in renderers)
+            {
+                if (r.enabled)
+                    r.DrawNormal(spriteBatch, gameTime);
+            }
         }
 
-        public GameObject Instantiate()
+        internal void DrawSpecular(SpriteBatch spriteBatch, GameTime gameTime)
         {
-            return SceneManager.CurrentScene.InstantiateGameObject();
+            var renderers = Components.Values.OfType<Renderer>();
+            foreach (Renderer r in renderers)
+            {
+                if (r.enabled)
+                    r.DrawSpecular(spriteBatch, gameTime);
+            }
         }
 
-        public Physics.PhysicsLayer layer = Physics.PhysicsLayer.Layer1;
+        internal void DrawEmissive(SpriteBatch spriteBatch, GameTime gameTime)
+        {
+            var renderers = Components.Values.OfType<Renderer>();
+            foreach (Renderer r in renderers)
+            {
+                if (r.enabled)
+                    r.DrawEmissive(spriteBatch, gameTime);
+            }
+        }
+
+        internal void RemoveComponent(Type t)
+        {
+            Components.Remove(t);
+        }
+        #endregion
+
+        #region Static Functions
+        /// <summary>
+        /// Finds a GameObject by name and returns it.
+        /// </summary>
+        /// <remarks>
+        /// This function only returns active GameObjects. If no GameObject with name can be found, null is returned.
+        /// If name contains a '/' character, it traverses the hierarchy like a path name.
+        ///
+        /// For performance reasons, it is recommended to not use this function every frame.Instead, cache the result
+        /// in a member variable at startup, or use GameObject.FindWithTag.
+        ///
+        /// Note: If you wish to find a child GameObject, it is often easier to use Transform.FindChild.
+        /// </remarks>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static GameObject Find(string name)
+        {
+            string[] names = name.Split('/');
+            foreach(GameObject go in SceneManager.CurrentScene.ActiveGameObjects)
+            {
+                if (go.name == names[0])
+                {
+                    GameObject g = FindIn(names, 1, go);
+                    if (g != null)
+                        return g;
+                }
+            }
+
+            foreach(GameObject go in SceneManager.CurrentScene.InstantiatedGameObjects)
+            {
+                if (go.name == names[0])
+                {
+                    GameObject g = FindIn(names, 1, go);
+                    if (g != null)
+                        return g;
+                }
+            }
+
+            return null;
+        }
+
+        private static GameObject FindIn(string[] names, int count, GameObject g)
+        {
+            foreach(Transform t in g.transform.GetChildren())
+            {
+                if(t.GameObject.name == names[count])
+                {
+                    if(count == names.Length - 1)
+                    {
+                        return t.GameObject;
+                    }
+                    else
+                    {
+                        GameObject gg = FindIn(names, count + 1, t.GameObject);
+                        if (gg != null)
+                            return gg;
+                    }
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Returns a list of active GameObjects tagged tag. Returns empty array if no GameObject was found.
+        /// </summary>
+        /// <param name="tag">The name of the tag to search GameObjects for.</param>
+        /// <returns></returns>
+        public static GameObject[] FindGameObjectsWithTag(string tag)
+        {
+            List<GameObject> taggedObjs;
+            SceneManager.CurrentScene.taggedObjects.TryGetValue(tag, out taggedObjs);
+            if (taggedObjs != null)
+                return taggedObjs.ToArray();
+
+            return new GameObject[0];
+        }
+
+        /// <summary>
+        /// Returns one active GameObject tagged tag. Returns null if no GameObject was found.
+        /// </summary>
+        /// <param name="tag">The tag to search for.</param>
+        /// <returns></returns>
+        public static GameObject FindWithTag(string tag)
+        {
+            List<GameObject> taggedObjs;
+            SceneManager.CurrentScene.taggedObjects.TryGetValue(tag, out taggedObjs);
+            if (taggedObjs != null && taggedObjs.Count > 0)
+                return taggedObjs[0];
+
+            return null;
+        }
+        #endregion
     }
 }

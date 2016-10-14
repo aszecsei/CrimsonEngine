@@ -8,7 +8,7 @@ namespace CrimsonEngine
 {
     public class ResourceManager
     {
-        private static Dictionary<Type, Dictionary<String, Object>> _resources = new Dictionary<Type, Dictionary<string, object>>();
+        private static Dictionary<Type, Dictionary<string, object>> _resources = new Dictionary<Type, Dictionary<string, object>>();
 
         public static void StoreResource<T>(String name, T obj)
         {

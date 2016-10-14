@@ -63,6 +63,7 @@
     <Compile Include="Keyframe.cs" />
     <Compile Include="Light.cs" />
     <Compile Include="Mathf.cs" />
+    <Compile Include="Object.cs" />
     <Compile Include="Physics\Bounds.cs" />
     <Compile Include="Physics\CollisionDetectionMode.cs" />
     <Compile Include="Physics\ForceMode.cs" />

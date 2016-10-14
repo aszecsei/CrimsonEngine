@@ -117,8 +117,15 @@ namespace CrimsonEngine
         /// <returns></returns>
         public static int ClosestPowerOfTwo(int value)
         {
-            // TODO: Implement this
-            throw new NotImplementedException();
+            float log = Log(value, 2);
+            int logFloor = FloorToInt(log);
+            int logCeil = CeilToInt(log);
+            float lower = Pow(2, logFloor);
+            float highter = Pow(2, logCeil);
+            if (value - lower < highter - value)
+                return (int)lower;
+            else
+                return (int)highter;
         }
 
         /// <summary>
@@ -187,8 +194,9 @@ namespace CrimsonEngine
         /// <returns></returns>
         public static float InverseLerp(float a, float b, float value)
         {
-            // TODO: Implement this
-            throw new NotImplementedException();
+            if (Approximately(b - a, 0f))
+                throw new DivideByZeroException();
+            return (value - a) / (b - a);
         }
 
         /// <summary>
@@ -198,7 +206,7 @@ namespace CrimsonEngine
         /// <returns></returns>
         public static bool IsPowerOfTwo(int value)
         {
-            return Math.Pow(Mathf.FloorToInt(Mathf.Log(value, 2)), 2) == value;
+            return Approximately(Mathf.Pow(Mathf.FloorToInt(Mathf.Log(value, 2)), 2), value);
         }
 
         /// <summary>
