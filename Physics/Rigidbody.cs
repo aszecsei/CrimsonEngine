@@ -773,8 +773,42 @@ namespace CrimsonEngine.Physics
                     Rigidbody r = go.GetComponent<Rigidbody>();
                     if (r && go != GameObject && (fixtureB.Body == r.body || fixtureA.Body == r.body))
                     {
-                        go.BroadcastMessage("OnCollisionEnter", r);
-                        GameObject.BroadcastMessage("OnCollisionEnter", r);
+                        // Create the collision object
+                        Collision coll = new Collision();
+                        coll.gameObject = go;
+                        coll.rigidbody = r;
+                        coll.transform = go.transform;
+                        coll.enabled = contact.Enabled;
+                        ContactPoint[] cps = new ContactPoint[contact.Manifold.PointCount];
+                        for(int i=0; i<contact.Manifold.PointCount; i++)
+                        {
+                            cps[i] = new ContactPoint();
+                            cps[i].collider = this;
+                            cps[i].normal = contact.Manifold.LocalNormal * Physics2D.unitToPixel;
+                            cps[i].point = contact.Manifold.Points[i].LocalPoint * Physics2D.unitToPixel;
+                            cps[i].otherCollider = r;
+                        }
+                        coll.contacts = cps;
+                        coll.relativeVelocity = r.body.LinearVelocity - this.body.LinearVelocity;
+                        GameObject.BroadcastMessage("OnCollisionEnter", coll);
+
+                        coll = new Collision();
+                        coll.gameObject = GameObject;
+                        coll.rigidbody = this;
+                        coll.transform = transform;
+                        coll.enabled = contact.Enabled;
+                        cps = new ContactPoint[contact.Manifold.PointCount];
+                        for(int i=0; i<contact.Manifold.PointCount; i++)
+                        {
+                            cps[i] = new ContactPoint();
+                            cps[i].collider = r;
+                            cps[i].normal = contact.Manifold.LocalNormal * Physics2D.unitToPixel;
+                            cps[i].point = contact.Manifold.Points[i].LocalPoint * Physics2D.unitToPixel;
+                            cps[i].otherCollider = this;
+                        }
+                        coll.contacts = cps;
+                        coll.relativeVelocity = this.body.LinearVelocity - r.body.LinearVelocity;
+                        go.BroadcastMessage("OnCollisionEnter", coll);
                         return true;
                     }
                 }
