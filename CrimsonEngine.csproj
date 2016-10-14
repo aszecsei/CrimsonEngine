@@ -65,7 +65,10 @@
     <Compile Include="Mathf.cs" />
     <Compile Include="Object.cs" />
     <Compile Include="Physics\Bounds.cs" />
+    <Compile Include="Physics\Collision.cs" />
     <Compile Include="Physics\CollisionDetectionMode.cs" />
+    <Compile Include="Physics\ContactListener.cs" />
+    <Compile Include="Physics\ContactPoint.cs" />
     <Compile Include="Physics\ForceMode.cs" />
     <Compile Include="Physics\Physics2D.cs" />
     <Compile Include="Physics\PhysicsLayer.cs" />

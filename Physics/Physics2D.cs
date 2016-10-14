@@ -532,7 +532,11 @@ namespace CrimsonEngine.Physics
 
         internal static void Initialize()
         {
-            world = new FarseerPhysics.Dynamics.World(Gravity);
+            world = new World(Gravity);
+            world.ContactManager.PreSolve = new PreSolveDelegate(ContactListener.PreSolve);
+            world.ContactManager.PostSolve += new PostSolveDelegate(ContactListener.PostSolve);
+            world.ContactManager.BeginContact += new BeginContactDelegate(ContactListener.BeginContact);
+            world.ContactManager.EndContact += new EndContactDelegate(ContactListener.EndContact);
 
             FarseerPhysics.Settings.AllowSleep = true;
             FarseerPhysics.Settings.VelocityIterations = velocityIterations;

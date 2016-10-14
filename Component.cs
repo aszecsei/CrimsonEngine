@@ -131,7 +131,14 @@ namespace CrimsonEngine
             System.Reflection.MethodInfo mI = GetType().GetMethod(methodName, bf);
             if (mI != null)
             {
-                mI.Invoke(this, null);
+                try
+                {
+                    mI.Invoke(this, parameters);
+                }
+                catch(ArgumentException)
+                {
+                    // Do nothing
+                }
             }
         }
     }
