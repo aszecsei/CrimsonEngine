@@ -541,7 +541,7 @@ namespace CrimsonEngine.Physics
 
         internal static void Simulate()
         {
-            world.Step(Time.actualFixedDeltaTime);
+            world.Step(Time.fixedDeltaTime);
         }
     }
 }

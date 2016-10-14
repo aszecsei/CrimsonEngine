@@ -323,6 +323,7 @@ namespace CrimsonEngine
                 Rigidbody r = go.GetComponent<Rigidbody>();
                 if (r != null)
                 {
+                    r.ResetAfterMoveRot();
                     r.UpdateTransform();
                 }
             }

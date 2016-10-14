@@ -8,12 +8,20 @@ using Microsoft.Xna.Framework;
 using FarseerPhysics.Dynamics;
 using FarseerPhysics.Collision.Shapes;
 using FarseerPhysics.Common;
+using System.Collections;
 
 namespace CrimsonEngine.Physics
 {
     public class Rigidbody : Component
     {
         internal Body body;
+
+        private bool _justDidMovePosition = false;
+        private bool _justDidMoveRotation = false;
+
+        private float prevAngDamp;
+        private float prevLinDamp;
+        private bool prevIgnoreGrav;
 
         private FarseerPhysics.Collision.AABB AABB
         {
@@ -102,6 +110,13 @@ namespace CrimsonEngine.Physics
             {
                 body.AngularDamping = value;
             }
+        }
+
+        private bool _isTrigger = false;
+        public bool IsTrigger
+        {
+            get { return _isTrigger; }
+            set { body.IsSensor = value; _isTrigger = value; }
         }
 
         /// <summary>
@@ -577,8 +592,15 @@ namespace CrimsonEngine.Physics
         /// <param name="position">The new position for the Rigidbody object.</param>
         public void MovePosition(Vector2 position)
         {
-            Vector2 linearVelocity = position - position;
-            this.AddForce(linearVelocity, ForceMode.Impulse);
+            prevLinDamp = body.LinearDamping;
+            prevIgnoreGrav = body.IgnoreGravity;
+            body.IgnoreGravity = true;
+            body.LinearDamping = 0f;
+            Vector2 nextPos = body.Position + body.LinearVelocity * Time.fixedDeltaTime;
+            Vector2 deltaMove = (position * Physics2D.pixelToUnit) - nextPos;
+            Vector2 desiredLinearVelocity = deltaMove / Time.fixedDeltaTime;
+            body.LinearVelocity += (Microsoft.Xna.Framework.Vector2)desiredLinearVelocity;
+            _justDidMovePosition = true;
         }
 
         /// <summary>
@@ -605,13 +627,13 @@ namespace CrimsonEngine.Physics
         /// <param name="angle">The new rotation angle for the Rigidbody object.</param>
         public void MoveRotation(float angle)
         {
-            float rot = (((float)Math.PI * angle) / 180.0f) - rotation;
-            if (rot > 180.0f)
-                rot -= 180.0f;
-            if (rot < 0.0f)
-                rot += 180f;
-
-            this.AddTorque(rot, ForceMode.Impulse);
+            prevAngDamp = body.AngularDamping;
+            body.AngularDamping = 0f;
+            float nextAngle = body.Rotation + body.AngularVelocity * Time.fixedDeltaTime;
+            float totalRotation = Mathf.DeltaAngle(nextAngle, angle);
+            float desiredAngularVelocity = totalRotation / Time.fixedDeltaTime;
+            body.AngularVelocity += desiredAngularVelocity;
+            _justDidMoveRotation = true;
         }
 
         /// <summary>
@@ -694,6 +716,70 @@ namespace CrimsonEngine.Physics
                 }
                 body.Awake = true;
             }
+
+            body.OnCollision += Body_OnCollision;
+            body.OnSeparation += Body_OnSeparation;
+        }
+
+        private void Body_OnSeparation(Fixture fixtureA, Fixture fixtureB)
+        {
+            if(IsTrigger)
+            {
+                foreach(GameObject go in SceneManager.CurrentScene.ActiveGameObjects)
+                {
+                    Rigidbody r = go.GetComponent<Rigidbody>();
+                    if(r && go != GameObject && (fixtureB.Body == r.body || fixtureA.Body == r.body))
+                    {
+                        go.BroadcastMessage("OnTriggerExit", r);
+                        GameObject.BroadcastMessage("OnTriggerExit", r);
+                        return;
+                    }
+                }
+            }
+            else
+            {
+                foreach (GameObject go in SceneManager.CurrentScene.ActiveGameObjects)
+                {
+                    Rigidbody r = go.GetComponent<Rigidbody>();
+                    if (r && go != GameObject && (fixtureB.Body == r.body || fixtureA.Body == r.body))
+                    {
+                        go.BroadcastMessage("OnCollisionExit", r);
+                        GameObject.BroadcastMessage("OnCollisionExit", r);
+                        return;
+                    }
+                }
+            }
+        }
+
+        private bool Body_OnCollision(Fixture fixtureA, Fixture fixtureB, FarseerPhysics.Dynamics.Contacts.Contact contact)
+        {
+            if (IsTrigger)
+            {
+                foreach (GameObject go in SceneManager.CurrentScene.ActiveGameObjects)
+                {
+                    Rigidbody r = go.GetComponent<Rigidbody>();
+                    if (r && go != GameObject && (fixtureB.Body == r.body || fixtureA.Body == r.body))
+                    {
+                        go.BroadcastMessage("OnTriggerEnter", r);
+                        GameObject.BroadcastMessage("OnTriggerEnter", r);
+                        return true;
+                    }
+                }
+            }
+            else
+            {
+                foreach (GameObject go in SceneManager.CurrentScene.ActiveGameObjects)
+                {
+                    Rigidbody r = go.GetComponent<Rigidbody>();
+                    if (r && go != GameObject && (fixtureB.Body == r.body || fixtureA.Body == r.body))
+                    {
+                        go.BroadcastMessage("OnCollisionEnter", r);
+                        GameObject.BroadcastMessage("OnCollisionEnter", r);
+                        return true;
+                    }
+                }
+            }
+            return true;
         }
 
         public void UpdateBodyPosition()
@@ -748,5 +834,24 @@ namespace CrimsonEngine.Physics
             Debug.DrawDebugLine(position - Vector2.up, position + Vector2.up, c, lw);
             Debug.DrawDebugLine(position - Vector2.right, position + Vector2.right, c, lw);
         }
+
+        internal void ResetAfterMoveRot()
+        {
+            if (_justDidMovePosition)
+            {
+                body.LinearVelocity = Vector2.zero;
+                body.LinearDamping = prevLinDamp;
+                body.IgnoreGravity = prevIgnoreGrav;
+                _justDidMovePosition = false;
+            }
+            if (_justDidMoveRotation)
+            {
+                body.AngularVelocity = 0f;
+                body.AngularDamping = prevAngDamp;
+                _justDidMoveRotation = false;
+            }
+        }
+
+        
     }
 }
