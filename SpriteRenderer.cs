@@ -21,6 +21,14 @@ namespace CrimsonEngine
         public bool flipHorizontal = false;
         public bool flipVertical = false;
 
+        public Physics.Bounds bounds
+        {
+            get
+            {
+                return new Physics.Bounds((Vector2)GameObject.transform.GlobalPosition - Origin, Vector2.Scale(new Vector2(Diffuse.Width, Diffuse.Height), GameObject.transform.GlobalScale));
+            }
+        }
+
         private SpriteEffects effect
         {
             get

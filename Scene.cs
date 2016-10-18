@@ -54,9 +54,23 @@ namespace CrimsonEngine
 
         private RenderTarget2D diffuseRenderTarget;
         private RenderTarget2D normalRenderTarget;
-        private RenderTarget2D lightRenderTarget;
-        private RenderTarget2D shadowRenderTarget;
         private RenderTarget2D depthRenderTarget;
+
+        private int _maxLightFalloff;
+        public int MaxLightFalloff
+        {
+            get
+            {
+                return _maxLightFalloff;
+            }
+            set
+            {
+                occlusionRenderTarget = new RenderTarget2D(graphicsDevice, MaxLightFalloff, MaxLightFalloff);
+                shadowLookupRenderTarget = new RenderTarget2D(graphicsDevice, MaxLightFalloff, 1);
+            }
+        }
+        private RenderTarget2D occlusionRenderTarget;
+        private RenderTarget2D shadowLookupRenderTarget;
 
         private List<IEnumerator> Coroutines = new List<IEnumerator>();
         private List<IEnumerator> shouldRunNextFrame = new List<IEnumerator>();
@@ -75,7 +89,6 @@ namespace CrimsonEngine
         };
 
         private int numFixedUpdates = 0;
-        private bool hasStarted = false;
         #endregion
 
         #region Constructor
@@ -87,8 +100,8 @@ namespace CrimsonEngine
 
             diffuseRenderTarget = new RenderTarget2D(graphicsDevice, (int)internalResolution.x, (int)internalResolution.y);
             normalRenderTarget = new RenderTarget2D(graphicsDevice, (int)internalResolution.x, (int)internalResolution.y);
-            lightRenderTarget = new RenderTarget2D(graphicsDevice, (int)internalResolution.x, (int)internalResolution.y);
-            shadowRenderTarget = new RenderTarget2D(graphicsDevice, (int)internalResolution.x, (int)internalResolution.y);
+            occlusionRenderTarget = new RenderTarget2D(graphicsDevice, (int)internalResolution.x, (int)internalResolution.y);
+            // shadowLookupRenderTarget = new RenderTarget2D(graphicsDevice, MaxLightFalloff, 1);
             depthRenderTarget = new RenderTarget2D(graphicsDevice, (int)internalResolution.x, (int)internalResolution.y);
 
             Physics2D.Initialize();
@@ -453,7 +466,7 @@ namespace CrimsonEngine
 
         private bool shouldDraw(GameObject go)
         {
-            return go.activeInHierarchy && (go.transform.GlobalPosition.z >= Camera2D.main.transform.GlobalPosition.z);
+            return go.activeInHierarchy && (go.transform.GlobalPosition.z >= Camera2D.main.transform.GlobalPosition.z) && (go.GetComponent<SpriteRenderer>() != null && Physics.Bounds.Collides(go.GetComponent<SpriteRenderer>().bounds, Camera2D.main.CameraBounds));
         }
 
         private void DrawScene(SpriteBatch spriteBatch, GameTime gameTime)
@@ -501,8 +514,8 @@ namespace CrimsonEngine
                 depthRange = 1;
 
             // using this, we can calculate a float from 0-1 representing the depth of a game object
-            Effect depthMap = ResourceManager.GetResource<Effect>("DepthMap");
-            spriteBatch.Begin(effect: depthMap, transformMatrix: Camera2D.main.TranslationMatrix, samplerState: SamplerState.PointClamp, blendState: BlendState.AlphaBlend, sortMode: SpriteSortMode.BackToFront);
+            Effect colorFill = ResourceManager.GetResource<Effect>("Color Fill");
+            spriteBatch.Begin(effect: colorFill, transformMatrix: Camera2D.main.TranslationMatrix, samplerState: SamplerState.PointClamp, blendState: BlendState.AlphaBlend, sortMode: SpriteSortMode.BackToFront);
             float currentDepth = minDepth;
             foreach (GameObject go in ActiveGameObjects)
             {
@@ -512,11 +525,11 @@ namespace CrimsonEngine
                     {
                         currentDepth = go.transform.GlobalPosition.z;
                         spriteBatch.End();
-                        spriteBatch.Begin(effect: depthMap, transformMatrix: Camera2D.main.TranslationMatrix, samplerState: SamplerState.PointClamp, blendState: BlendState.AlphaBlend, sortMode: SpriteSortMode.BackToFront);
+                        spriteBatch.Begin(effect: colorFill, transformMatrix: Camera2D.main.TranslationMatrix, samplerState: SamplerState.PointClamp, blendState: BlendState.AlphaBlend, sortMode: SpriteSortMode.BackToFront);
                     }
                     float depthValue = (((go.transform.GlobalPosition.z - minDepth) / depthRange) * 0.8f);
-                    depthMap.Parameters["depth"].SetValue(depthValue);
-                    depthMap.CurrentTechnique.Passes[0].Apply();
+                    colorFill.Parameters["color"].SetValue(new Vector3(depthValue, depthValue, depthValue));
+                    colorFill.CurrentTechnique.Passes[0].Apply();
                     go.DrawDiffuse(spriteBatch, gameTime);
                 }
             }

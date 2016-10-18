@@ -66,5 +66,18 @@ namespace CrimsonEngine.Physics
             this.center = center;
             this.size = size;
         }
+
+        public Bounds(float top, float left, float bottom, float right)
+        {
+            this.center = new Vector2(left + right / 2f, top + bottom / 2f);
+            this.size = new Vector2(Mathf.Abs(right - left), Mathf.Abs(top - bottom));
+        }
+
+        public static bool Collides(Bounds lhs, Bounds rhs)
+        {
+            if (lhs.min.x > rhs.max.x || rhs.min.x > lhs.max.x || lhs.min.y > rhs.max.y || rhs.min.y > lhs.max.y)
+                return false;
+            return true;
+        }
     }
 }

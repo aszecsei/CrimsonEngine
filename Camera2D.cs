@@ -22,6 +22,16 @@ namespace CrimsonEngine
             }
         }
 
+        public Physics.Bounds CameraBounds
+        {
+            get
+            {
+                Vector2 topLeft = ScreenToWorld(new Vector2(0, 0));
+                Vector2 bottomRight = ScreenToWorld(ViewportCenter * 2f);
+                return new Physics.Bounds(topLeft.y, topLeft.x, bottomRight.y, bottomRight.x);
+            }
+        }
+
         public Camera2D() : base()
         {
             Zoom = 1.0f;
