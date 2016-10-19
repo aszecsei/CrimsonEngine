@@ -116,7 +116,7 @@ namespace CrimsonEngine.Physics
         public bool IsTrigger
         {
             get { return _isTrigger; }
-            set { body.IsSensor = value; _isTrigger = value; }
+            set { body.IsSensor = value; _isTrigger = value; gravityScale = value ? 0 : 1; }
         }
 
         /// <summary>
@@ -737,7 +737,11 @@ namespace CrimsonEngine.Physics
 
             if(!isStatic)
             {
-                if(IsAwake())
+                if(IsTrigger)
+                {
+                    c = Color.yellow;
+                }
+                else if(IsAwake())
                 {
                     c = Color.green;
                 }
