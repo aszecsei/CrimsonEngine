@@ -64,6 +64,8 @@
     <Compile Include="Light.cs" />
     <Compile Include="Mathf.cs" />
     <Compile Include="Object.cs" />
+    <Compile Include="Particle.cs" />
+    <Compile Include="ParticleSystem.cs" />
     <Compile Include="Physics\Bounds.cs" />
     <Compile Include="Physics\Collision.cs" />
     <Compile Include="Physics\CollisionDetectionMode.cs" />
