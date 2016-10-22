@@ -78,18 +78,6 @@ namespace CrimsonEngine
         {
             return GameObject.GetComponent<T>();
         }
-        
-        /// <summary>
-        /// Requires the inclusion of the given component. If the game object doesn't contain this component, it instantiates it.
-        /// </summary>
-        /// <typeparam name="T">The component to require.</typeparam>
-        public void Requires<T>() where T : Component, new()
-        {
-            if (GameObject.GetComponent<T>() == null)
-            {
-                GameObject.AddComponent<T>();
-            }
-        }
 
         /// <summary>
         /// Calls the method named methodName on every MonoBehaviour in this game object.

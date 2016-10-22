@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Linq.Expressions;
 
 namespace CrimsonEngine
 {
@@ -76,7 +77,7 @@ namespace CrimsonEngine
             }
             set
             {
-                AddComponent<Transform>(value);
+                Components[typeof(Transform)] = value;
             }
         }
         #endregion Variables
@@ -104,15 +105,25 @@ namespace CrimsonEngine
         #region Public Functions
         public T AddComponent<T>() where T : Component, new()
         {
-            return AddComponent(new T());
+            return (T)AddComponent(typeof(T));
         }
 
-        public T AddComponent<T>(T component) where T : Component
+        public Component AddComponent(Type componentType)
         {
-            component.GameObject = this;
-            Components[typeof(T)] = component;
-            component.Invoke("Awake");
-            return component;
+            Component c = (Component)Activator.CreateInstance(componentType);
+            c.GameObject = this;
+            Components[componentType] = c;
+            foreach (object attributes in c.GetType().GetCustomAttributes(true))
+            {
+                if (attributes is RequireComponent)
+                {
+                    Type reqType = (attributes as RequireComponent).requiredType;
+                    if(!Components.ContainsKey(reqType))
+                        AddComponent(reqType);
+                }
+            }
+            c.Invoke("Awake");
+            return c;
         }
 
         /// <summary>
@@ -213,16 +224,6 @@ namespace CrimsonEngine
             {
                 if (r.enabled)
                     r.DrawNormal(spriteBatch, gameTime);
-            }
-        }
-
-        internal void DrawSpecular(SpriteBatch spriteBatch, GameTime gameTime)
-        {
-            var renderers = Components.Values.OfType<Renderer>();
-            foreach (Renderer r in renderers)
-            {
-                if (r.enabled)
-                    r.DrawSpecular(spriteBatch, gameTime);
             }
         }
 

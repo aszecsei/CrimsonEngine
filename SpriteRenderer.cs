@@ -9,10 +9,7 @@ namespace CrimsonEngine
 {
     public class SpriteRenderer : Renderer
     {
-        public Texture2D Diffuse = null;
-        public Texture2D Normal = null;
-        public Texture2D Specular = null;
-        public Texture2D Emissive = null;
+        public Material material = new Material();
 
         public Color TintColor = Color.white;
 
@@ -25,7 +22,7 @@ namespace CrimsonEngine
         {
             get
             {
-                return new Physics.Bounds((Vector2)GameObject.transform.GlobalPosition - Origin, Vector2.Scale(new Vector2(Diffuse.Width, Diffuse.Height), GameObject.transform.GlobalScale));
+                return new Physics.Bounds((Vector2)GameObject.transform.GlobalPosition - Origin, Vector2.Scale(new Vector2(material.DiffuseTexture.Width, material.DiffuseTexture.Height), GameObject.transform.GlobalScale));
             }
         }
 
@@ -46,9 +43,9 @@ namespace CrimsonEngine
 
         public override void DrawDiffuse(SpriteBatch spriteBatch, GameTime gameTime)
         {
-            if(Diffuse  != null)
+            if(material.DiffuseTexture != null)
             {
-                spriteBatch.Draw(texture: Diffuse, 
+                spriteBatch.Draw(texture: material.DiffuseTexture, 
                     position: new Vector2(GameObject.transform.GlobalPosition.x, -GameObject.transform.GlobalPosition.y), 
                     color: TintColor, 
                     rotation: GameObject.transform.GlobalRotation, 
@@ -64,9 +61,9 @@ namespace CrimsonEngine
 
         public override void DrawNormal(SpriteBatch spriteBatch, GameTime gameTime)
         {
-            if (Normal != null)
+            if (material.NormalTexture != null)
             {
-                spriteBatch.Draw(texture: Normal,
+                spriteBatch.Draw(texture: material.NormalTexture,
                     position: new Vector2(GameObject.transform.GlobalPosition.x, -GameObject.transform.GlobalPosition.y),
                     color: TintColor,
                     rotation: GameObject.transform.GlobalRotation,
@@ -82,9 +79,9 @@ namespace CrimsonEngine
 
         public override void DrawEmissive(SpriteBatch spriteBatch, GameTime gameTime)
         {
-            if (Emissive != null)
+            if (material.EmissiveTexture != null)
             {
-                spriteBatch.Draw(texture: Emissive,
+                spriteBatch.Draw(texture: material.EmissiveTexture,
                     position: new Vector2(GameObject.transform.GlobalPosition.x, -GameObject.transform.GlobalPosition.y),
                     color: TintColor,
                     rotation: GameObject.transform.GlobalRotation,
@@ -95,24 +92,6 @@ namespace CrimsonEngine
             else
             {
                 // TODO: Draw blank emissive map
-            }
-        }
-
-        public override void DrawSpecular(SpriteBatch spriteBatch, GameTime gameTime)
-        {
-            if (Specular != null)
-            {
-                spriteBatch.Draw(texture: Specular,
-                    position: new Vector2(GameObject.transform.GlobalPosition.x, -GameObject.transform.GlobalPosition.y),
-                    color: TintColor,
-                    rotation: GameObject.transform.GlobalRotation,
-                    origin: Origin,
-                    scale: new Vector2(GameObject.transform.GlobalScale.x, GameObject.transform.GlobalScale.y),
-                    effects: effect);
-            }
-            else
-            {
-                // TODO: Draw blank specular map
             }
         }
     }
