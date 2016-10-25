@@ -108,6 +108,23 @@ namespace CrimsonEngine
             return (T)AddComponent(typeof(T));
         }
 
+        public T AddComponent<T>(T component) where T : Component
+        {
+            component.GameObject = this;
+            Components[typeof(T)] = component;
+            foreach (object attributes in component.GetType().GetCustomAttributes(true))
+            {
+                if (attributes is RequireComponent)
+                {
+                    Type reqType = (attributes as RequireComponent).requiredType;
+                    if (!Components.ContainsKey(reqType))
+                        AddComponent(reqType);
+                }
+            }
+            component.Invoke("Awake");
+            return component;
+        }
+
         public Component AddComponent(Type componentType)
         {
             Component c = (Component)Activator.CreateInstance(componentType);
@@ -207,6 +224,15 @@ namespace CrimsonEngine
         #endregion
 
         #region Internal Functions
+        internal bool hasRenderer
+        {
+            get
+            {
+                var renderers = Components.Values.OfType<Renderer>();
+                return renderers.Count() > 0;
+            }
+        }
+
         internal void DrawDiffuse(SpriteBatch spriteBatch, GameTime gameTime)
         {
             var renderers = Components.Values.OfType<Renderer>();

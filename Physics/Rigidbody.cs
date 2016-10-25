@@ -596,9 +596,9 @@ namespace CrimsonEngine.Physics
             prevIgnoreGrav = body.IgnoreGravity;
             body.IgnoreGravity = true;
             body.LinearDamping = 0f;
-            Vector2 nextPos = body.Position + body.LinearVelocity * Time.fixedDeltaTime;
+            Vector2 nextPos = body.Position + body.LinearVelocity * Time.actualFixedDeltaTime;
             Vector2 deltaMove = (position * Physics2D.pixelToUnit) - nextPos;
-            Vector2 desiredLinearVelocity = deltaMove / Time.fixedDeltaTime;
+            Vector2 desiredLinearVelocity = deltaMove / Time.actualFixedDeltaTime;
             body.LinearVelocity += (Microsoft.Xna.Framework.Vector2)desiredLinearVelocity;
             _justDidMovePosition = true;
         }
@@ -629,9 +629,9 @@ namespace CrimsonEngine.Physics
         {
             prevAngDamp = body.AngularDamping;
             body.AngularDamping = 0f;
-            float nextAngle = body.Rotation + body.AngularVelocity * Time.fixedDeltaTime;
+            float nextAngle = body.Rotation + body.AngularVelocity * Time.actualFixedDeltaTime;
             float totalRotation = Mathf.DeltaAngle(nextAngle, angle);
-            float desiredAngularVelocity = totalRotation / Time.fixedDeltaTime;
+            float desiredAngularVelocity = totalRotation / Time.actualFixedDeltaTime;
             body.AngularVelocity += desiredAngularVelocity;
             _justDidMoveRotation = true;
         }

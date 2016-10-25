@@ -25,23 +25,77 @@ namespace CrimsonEngine
         #endregion
 
         #region Variables
-        
+        private float _r;
+        private float _g;
+        private float _b;
+        private float _a;
+
+        public float r
+        {
+            get
+            {
+                return _r;
+            }
+            set
+            {
+                _internal.R = (byte)Mathf.RoundToInt(_r * 255);
+            }
+        }
+
+        public float g
+        {
+            get
+            {
+                return _g;
+            }
+            set
+            {
+                _internal.G = (byte)Mathf.RoundToInt(_g * 255);
+            }
+        }
+
+        public float b
+        {
+            get
+            {
+                return _b;
+            }
+            set
+            {
+                _internal.B = (byte)Mathf.RoundToInt(_b * 255);
+            }
+        }
+
+        public float a
+        {
+            get
+            {
+                return _a;
+            }
+            set
+            {
+                _internal.A = (byte)Mathf.RoundToInt(_a * 255);
+            }
+        }
         #endregion
 
         #region Constructors
         public Color(float r, float g, float b, float a)
         {
+            _r = r;
+            _g = g;
+            _b = b;
+            _a = a;
             _internal = new Microsoft.Xna.Framework.Color(r, g, b, a);
         }
 
         public Color(float r, float g, float b)
         {
-            _internal = new Microsoft.Xna.Framework.Color(r, g, b);
-        }
-
-        private Color(Microsoft.Xna.Framework.Color color)
-        {
-            _internal = color;
+            _r = r;
+            _g = g;
+            _b = b;
+            _a = 1;
+            _internal = new Microsoft.Xna.Framework.Color(r, g, b, 1f);
         }
         #endregion
 
@@ -49,17 +103,16 @@ namespace CrimsonEngine
         #endregion
 
         #region Static Functions
+        public static Color Lerp(Color a, Color b, float t)
+        {
+            return new Color(Mathf.Lerp(a.r, b.r, t), Mathf.Lerp(a.g, b.g, t), Mathf.Lerp(a.b, b.b, t), Mathf.Lerp(a.a, b.a, t));
+        }
         #endregion
 
         #region Operators
         public static implicit operator Microsoft.Xna.Framework.Color(Color c)
         {
             return c._internal;
-        }
-
-        public static implicit operator Color(Microsoft.Xna.Framework.Color c)
-        {
-            return new Color(c);
         }
         #endregion
     }

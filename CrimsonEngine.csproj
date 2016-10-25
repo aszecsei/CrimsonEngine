@@ -66,7 +66,6 @@
     <Compile Include="Mathf.cs" />
     <Compile Include="Object.cs" />
     <Compile Include="ParticleSystem.cs" />
-    <Compile Include="ParticleSystemRenderer.cs" />
     <Compile Include="Physics\Bounds.cs" />
     <Compile Include="Physics\Collision.cs" />
     <Compile Include="Physics\CollisionDetectionMode.cs" />

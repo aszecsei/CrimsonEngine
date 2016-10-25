@@ -8,423 +8,294 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace CrimsonEngine
 {
-    [RequireComponent(typeof(ParticleSystemRenderer))]
     public class Particle
     {
-        /// <summary>
-        /// The angular velocity of the particle.
-        /// </summary>
-        public float angularVelocity;
+        public Vector2 position = Vector2.zero;
+        public Vector2 velocity = Vector2.zero;
 
-        /// <summary>
-        /// The lifetime of the particle.
-        /// </summary>
-        public float lifetime;
+        public float rotation = 0f;
+        public float angularVelocity = 0f;
 
-        /// <summary>
-        /// The position of the particle.
-        /// </summary>
-        public Vector2 position;
+        public Vector2 scale = Vector2.one;
 
-        /// <summary>
-        /// The random seed of the particle.
-        /// </summary>
-        public int randomSeed;
+        public Material material;
+        public Color color = Color.white;
 
-        /// <summary>
-        /// The rotation of the particle.
-        /// </summary>
-        public float rotation;
+        public float initialLifetime = 5.0f;
+        public float ttl;
+        public ParticleSystem parent { get; internal set; }
 
-        /// <summary>
-        /// The initial color of the particle. The current color of the particle
-        /// is calculated procedurally based on this value and the active color modules.
-        /// </summary>
-        public Color startColor;
+        public Random random;
+    }
 
-        /// <summary>
-        /// The starting lifetime of the particle.
-        /// </summary>
-        public float startLifetime;
+    public abstract class ParticleComponent
+    {
+        public bool enabled = true;
 
-        /// <summary>
-        /// The initial size of the particle. The current size of the particle is calculated
-        /// procedurally based on this value and the active size modules.
-        /// </summary>
-        public float startSize;
+        public virtual void Initialize(Particle p) { }
 
-        /// <summary>
-        /// The velocity of the particle.
-        /// </summary>
-        public Vector2 velocity;
+        public virtual void Update(Particle p, float deltaTime) { }
 
-        /// <summary>
-        /// Calculate the current color of the particle by applying the relevant curves to its
-        /// startColor property.
-        /// </summary>
-        /// <returns></returns>
-        public Color GetCurrentColor()
+        public virtual void UpdateParticleSystem(ParticleSystem ps, float deltaTime) { }
+    }
+
+    public class GravityParticleComponent : ParticleComponent
+    {
+        public Vector2 gravity = new Vector2(0, -10f);
+
+        public override void Update(Particle p, float deltaTime)
         {
-            return startColor;
+            p.velocity += gravity * deltaTime;
+        }
+    }
+
+    public class ColorOverLifetimeParticleComponent : ParticleComponent
+    {
+        public Color initialColor = Color.white;
+        public Color finalColor = Color.clear;
+
+        public override void Initialize(Particle p)
+        {
+            p.color = initialColor;
         }
 
-        /// <summary>
-        /// Calculate the current size of the particle by applying the relevant curves to its
-        /// startSize property.
-        /// </summary>
-        /// <returns></returns>
-        public float GetCurrentSize()
+        public override void Update(Particle p, float deltaTime)
         {
-            return startSize;
+            p.color = Color.Lerp(initialColor, finalColor, (p.initialLifetime - p.ttl) / p.initialLifetime);
+        }
+    }
+
+    public class SizeOverLifetimeParticleComponent : ParticleComponent
+    {
+        public float initialSize = 0.25f;
+        public float finalSize = 0f;
+
+        public override void Initialize(Particle p)
+        {
+            p.scale = new Vector2(initialSize, initialSize);
         }
 
-        internal void Update(float deltaTime)
+        public override void Update(Particle p, float deltaTime)
         {
-            lifetime -= deltaTime;
-            position += velocity * deltaTime;
-            rotation += angularVelocity * deltaTime;
+            float interpScale = Mathf.Lerp(initialSize, finalSize, (p.initialLifetime - p.ttl) / p.initialLifetime);
+            p.scale = new Vector2(interpScale, interpScale);
+        }
+    }
+
+    public class EmitterParticleComponent : ParticleComponent
+    {
+        public float rate = 60;
+        private float _timeSinceEmit = 0f;
+
+        public override void Initialize(Particle p)
+        {
+            p.velocity = new Vector2(p.random.Next(-5, 5), 0);
+            p.scale = new Vector2(0.25f, 0.25f);
+            p.initialLifetime = (float)p.random.NextDouble() * 2 + 3;
         }
 
-        internal Material material;
-    }
-
-    public struct CollisionModule
-    {
-        // TODO: Implement this
-    }
-
-    public struct ColorBySpeedModule
-    {
-        // TODO: Implement this
-    }
-
-    public struct ColorOverLifetimeModule
-    {
-        // TODO: Implement this
-    }
-
-    public struct EmissionModule
-    {
-        /// <summary>
-        /// The mode in which particles are emitted.
-        /// </summary>
-        public enum ParticleSystemEmissionType
+        public override void UpdateParticleSystem(ParticleSystem ps, float deltaTime)
         {
-            /// <summary>
-            /// Emit over time.
-            /// </summary>
-            Time,
-            /// <summary>
-            /// Emit when emitter moves.
-            /// </summary>
-            Distance
-        }
-
-        /// <summary>
-        /// The current number of bursts.
-        /// </summary>
-        public int burstCount;
-
-        /// <summary>
-        /// Enable/disable the Emission module.
-        /// </summary>
-        public bool enabled;
-
-        // TODO: Make this a curve
-        /// <summary>
-        /// The rate at which new particles are spawned.
-        /// </summary>
-        public float rate;
-
-        /// <summary>
-        /// The emission type.
-        /// </summary>
-        public ParticleSystemEmissionType type;
-    }
-
-    public struct EmitParams
-    {
-        // TODO: Implement this
-    }
-
-    public struct ForceOverLifetimeModule
-    {
-        
-    }
-
-    public struct InheritVelocityModule
-    {
-
-    }
-
-    public struct LimitVelocityOverLifetimeModule
-    {
-
-    }
-
-    public struct RotationBySpeedModule
-    {
-
-    }
-
-    public struct RotationOverLifetimeModule
-    {
-
-    }
-
-    public struct ShapeModule
-    {
-
-    }
-
-    public struct SizeBySpeedModule
-    {
-
-    }
-
-    public struct SizeOverLifetimeModule
-    {
-
-    }
-
-    public struct TextureSheetAnimation
-    {
-
-    }
-
-    public struct VelocityOverLifetimeModule
-    {
-
-    }
-
-    [RequireComponent(typeof(ParticleSystemRenderer))]
-    public class ParticleSystem : Component
-    {
-        private Particle[] particles;
-        private bool _isPlaying = true;
-        private int _numParticles = 0;
-        private uint _randomSeed = 0;
-
-        public CollisionModule collision = new CollisionModule();
-        public ColorBySpeedModule colorBySpeed = new ColorBySpeedModule();
-        public ColorOverLifetimeModule colorOverLifetime = new ColorOverLifetimeModule();
-
-        /// <summary>
-        /// The duration of the particle system in seconds (Read Only).
-        /// </summary>
-        public float duration
-        {
-            get
+            _timeSinceEmit += deltaTime;
+            float inverseRate = 1f / rate;
+            while(_timeSinceEmit >= inverseRate)
             {
-                // TODO: Implement this
-                return 0f;
+                ps.Emit();
+                _timeSinceEmit -= inverseRate;
             }
         }
+    }
 
-        public EmissionModule emission = new EmissionModule();
-        public ForceOverLifetimeModule forceOverLifetime = new ForceOverLifetimeModule();
-        public float gravityModifier = 1.0f;
-        public InheritVelocityModule inheritVelocity = new InheritVelocityModule();
+    public enum ParticleRenderMode
+    {
+        AlphaBlending,
+        Normal
+    }
 
-        
-        public bool isPaused
-        {
-            get { return !_isPlaying; }
-            set { _isPlaying = !value; }
-        }
-        public bool isPlaying
-        {
-            get { return _isPlaying; }
-            set { _isPlaying = value; }
-        }
-        public LimitVelocityOverLifetimeModule limitVelocityOverLifetime = new LimitVelocityOverLifetimeModule();
-        public bool loop = true;
+    public class ParticleSystem : Renderer
+    {
+        private Particle[] _particles;
+        public uint maxParticles = 1000;
+        private uint _numParticles = 0;
+        public uint numParticles { get { return _numParticles; } }
+        public List<ParticleComponent> components = new List<ParticleComponent>();
+        public bool fixedUpdate = false;
         public List<Material> materials = new List<Material>();
-        public int maxParticles = 1000;
-
-        public int particleCount
-        {
-            get { return _numParticles; }
-        }
-
-        public float playbackSpeed = 1f;
-        public bool playOnAwake = true;
-
-        public uint randomSeed
-        {
-            get { return _randomSeed; }
-            set { _randomSeed = value; useAutoRandomSeed = false; }
-        }
-        public ParticleSystemRenderer renderer;
-        public RotationBySpeedModule rotationBySpeed = new RotationBySpeedModule();
-        public RotationOverLifetimeModule rotationOverLifetime = new RotationOverLifetimeModule();
-        public Space simulationSpace = Space.World;
-        public SizeBySpeedModule sizeBySpeed = new SizeBySpeedModule();
-        public SizeOverLifetimeModule sizeOverLifetime = new SizeOverLifetimeModule();
-        public Color startColor = Color.white;
-        public float startDelay = 0f;
-        public float startLifetime = 5f;
-        public float startRotation = 0f;
-        public float startSize = 1f;
-        public Vector2 startSpeed = Vector2.zero;
-        public TextureSheetAnimation textureSheetAnimation = new TextureSheetAnimation();
-        public float time;
-        public bool useAutoRandomSeed = true;
-        public VelocityOverLifetimeModule velocityOverLifetime = new VelocityOverLifetimeModule();
-
-        public void Clear()
-        {
-
-        }
-
         private Random random;
+        private int _randomSeed = 0;
+        public int randomSeed { set { _useRandomSeed = true; _randomSeed = value; } }
+        private bool _useRandomSeed = false;
+        public Space space = Space.World;
 
-        public void Emit(int count)
+        public float lifetime = 5.0f;
+
+        public ParticleRenderMode renderMode = ParticleRenderMode.AlphaBlending;
+
+        public T AddParticleComponent<T>() where T : ParticleComponent, new()
         {
-            for(int i=0; i< Mathf.Min(count, maxParticles - _numParticles); i++)
+            T result = new T();
+            components.Add(result);
+            return result;
+        }
+
+        public uint Emit(int i)
+        {
+            int toAdd = (int)Mathf.Min(i, maxParticles - _numParticles);
+            for (int j=0; j<toAdd; j++)
             {
-                Particle p = new Particle();
-
-                p.angularVelocity = 0f;
-                p.lifetime = startLifetime;
-                p.material = materials[random.Next(materials.Count)];
-                p.position = simulationSpace == Space.Local ? Vector2.zero : (Vector2)GameObject.transform.GlobalPosition;
-                p.rotation = startRotation;
-                p.startColor = startColor;
-                p.startLifetime = startLifetime;
-                p.startSize = startSize;
-                p.velocity = startSpeed;
-
-                particles[_numParticles + i] = p;
+                Emit();
             }
-            _numParticles += count;
-        }
-        public void Emit(EmitParams emitParams, int count)
-        {
-
+            return _numParticles;
         }
 
-        private void CleanUp()
+        public Particle Emit()
         {
-            int pointer = 0;
-            int removed = 0;
-            for (int traverse=0; traverse<_numParticles; traverse++)
+            if(_numParticles < maxParticles)
             {
-                if(particles[traverse].lifetime <= 0f)
+                _particles[_numParticles] = new Particle();
+
+                /* Set up the particle */
+                _particles[_numParticles].parent = this;
+                _particles[_numParticles].material = materials[random.Next(materials.Count)];
+                _particles[_numParticles].random = new Random(random.Next());
+                _particles[_numParticles].initialLifetime = lifetime;
+
+                if (space == Space.World)
+                    _particles[_numParticles].position = transform.GlobalPosition;
+                else
+                    _particles[_numParticles].position = Vector2.zero;
+
+                foreach(ParticleComponent pc in components)
                 {
-                    particles[traverse] = null;
+                    pc.Initialize(_particles[_numParticles]);
+                }
+
+                _particles[_numParticles].ttl = _particles[_numParticles].initialLifetime;
+                _numParticles++;
+            }
+            else
+            {
+                // here for debugging purposes
+            }
+            return _particles[_numParticles - 1];
+        }
+
+        public void Flush()
+        {
+            int counter = 0;
+            uint removed = 0;
+            for(int pointer = 0; pointer<_numParticles; pointer++)
+            {
+                if(_particles[pointer].ttl <= 0f)
+                {
+                    _particles[pointer] = null;
                     removed++;
                 }
                 else
                 {
-                    if (pointer != traverse)
+                    if(counter != pointer)
                     {
-                        particles[pointer] = particles[traverse];
-                        particles[traverse] = null;
+                        _particles[counter] = _particles[pointer];
+                        _particles[pointer] = null;
                     }
-                    pointer++;
+                    counter++;
                 }
             }
-
             _numParticles -= removed;
         }
 
-        public int GetParticles(Particle[] particles)
-        {
-            int numParticles = Math.Min(_numParticles, particles.Length);
-            for (int i=0; i<numParticles; i++)
-            {
-                particles[i] = this.particles[i];
-            }
-            return numParticles;
-        }
-
-        public bool IsAlive()
-        {
-            // TODO: Implement this
-            return true;
-        }
-
-        public void Pause()
-        {
-            _isPlaying = false;
-        }
-
-        public void Play()
-        {
-            _isPlaying = true;
-        }
-
-        public void SetParticles(Particle[] particles, int size)
-        {
-            for(int i=0; i< size; i++)
-            {
-                this.particles[i] = particles[i];
-            }
-            for(int i= size; i<this.particles.Length; i++)
-            {
-                this.particles[i] = null;
-            }
-            this._numParticles = size;
-        }
-
-        public void Simulate(float t, bool restart = true, bool fixedTimestep = true)
+        public void Simulate(float deltaTime)
         {
             for(int i=0; i<_numParticles; i++)
             {
-                particles[i].Update(t);
+                Particle p = _particles[i];
+                p.ttl -= deltaTime;
+
+                foreach (ParticleComponent pc in components)
+                {
+                    pc.Update(p, deltaTime);
+                }
+
+                p.position += p.velocity * deltaTime;
+                p.rotation += p.angularVelocity * deltaTime;
+            }
+            foreach (ParticleComponent pc in components)
+            {
+                pc.UpdateParticleSystem(this, deltaTime);
+            }
+            Flush();
+        }
+
+        public override void DrawDiffuse(SpriteBatch spriteBatch, GameTime gameTime)
+        {
+            for (int i = 0; i < _numParticles; i++)
+            {
+                Particle p = _particles[i];
+
+                if (p.material.DiffuseTexture != null)
+                {
+                    spriteBatch.Draw(p.material.DiffuseTexture, position: Vector2.Scale(new Vector2(1, -1), p.position + ((space == Space.World) ? Vector2.zero : (Vector2)transform.GlobalPosition)), color: p.color, rotation: p.rotation, scale: p.scale);
+                }
+                else
+                {
+                    // TODO: Draw blank diffuse?
+                }
             }
         }
 
-        public void Stop()
+        public override void DrawEmissive(SpriteBatch spriteBatch, GameTime gameTime)
         {
+            for (int i = 0; i < _numParticles; i++)
+            {
+                Particle p = _particles[i];
 
+                if (p.material.EmissiveTexture != null)
+                {
+                    spriteBatch.Draw(p.material.EmissiveTexture, position: Vector2.Scale(new Vector2(1, -1), p.position + ((space == Space.World) ? Vector2.zero : (Vector2)transform.GlobalPosition)), color: p.color, rotation: p.rotation, scale: p.scale);
+                }
+                else
+                {
+                    // TODO: Draw blank emissive
+                }
+            }
+        }
+
+        public override void DrawNormal(SpriteBatch spriteBatch, GameTime gameTime)
+        {
+            for (int i = 0; i < _numParticles; i++)
+            {
+                Particle p = _particles[i];
+
+                if (p.material.NormalTexture != null)
+                {
+                    spriteBatch.Draw(p.material.NormalTexture, position: Vector2.Scale(new Vector2(1, -1), p.position + ((space == Space.World) ? Vector2.zero : (Vector2)transform.GlobalPosition)), color: p.color, rotation: p.rotation, scale: p.scale);
+                }
+                else
+                {
+                    // TODO: Draw blank normal
+                }
+            }
         }
 
         void Start()
         {
-            particles = new Particle[maxParticles];
-            renderer = GetComponent<ParticleSystemRenderer>();
-            random = useAutoRandomSeed ? new Random() : new Random((int)randomSeed);
-            emission.type = EmissionModule.ParticleSystemEmissionType.Time;
-            emission.rate = 60;
-            emission.enabled = true;
+            _particles = new Particle[maxParticles];
+            if (_useRandomSeed)
+                random = new Random(_randomSeed);
+            else
+                random = new Random();
         }
 
         void Update()
         {
-            // do the modules
-            HandleEmission();
-
-            time += Time.deltaTime;
-            for (int i = 0; i < _numParticles; i++)
-            {
-                particles[i].Update(Time.deltaTime);
-            }
-
-            CleanUp();
+            if(!fixedUpdate)
+                Simulate(Time.deltaTime);
         }
 
-        private float _timePassedSinceEmission = 0f;
-        private void HandleEmission()
+        void FixedUpdate()
         {
-            if(emission.enabled)
-            {
-                if (emission.type == EmissionModule.ParticleSystemEmissionType.Time)
-                {
-                    // get the number of particles emitted by the delta time
-                    _timePassedSinceEmission += Time.deltaTime;
-                    while (_timePassedSinceEmission > (1f / emission.rate))
-                    {
-                        Emit(1);
-                        _timePassedSinceEmission -= (1f / emission.rate);
-                    }
-                }
-                else
-                {
-                    // TODO: Implement distance-based particle emission
-                }
-            }
+            if (fixedUpdate)
+                Simulate(Time.actualFixedDeltaTime);
         }
     }
 }

@@ -133,11 +133,12 @@ namespace CrimsonEngine
                 numTimesToRunFixedUpdate = (int)Math.Floor((float)(Time.time - Time.fixedTime) / Time.fixedDeltaTime);
             }
 
+            Time.actualFixedDeltaTime = Time.fixedDeltaTime;
             // Never run our physics solver more than 5 times per frame
             if (numTimesToRunFixedUpdate > 5)
             {
                 float dT = numTimesToRunFixedUpdate * Time.fixedDeltaTime;
-                Time.actualFixedDeltaTime = Time.fixedDeltaTime / 5;
+                Time.actualFixedDeltaTime = dT / 5f;
                 numTimesToRunFixedUpdate = 5;
             }
             numFixedUpdates = numTimesToRunFixedUpdate;
@@ -466,7 +467,7 @@ namespace CrimsonEngine
 
         private bool shouldDraw(GameObject go)
         {
-            return go.activeInHierarchy && (go.transform.GlobalPosition.z >= Camera2D.main.transform.GlobalPosition.z) && (go.GetComponent<SpriteRenderer>() != null && Physics.Bounds.Collides(go.GetComponent<SpriteRenderer>().bounds, Camera2D.main.CameraBounds));
+            return go.activeInHierarchy && (go.transform.GlobalPosition.z >= Camera2D.main.transform.GlobalPosition.z) && go.hasRenderer && (go.GetComponent<SpriteRenderer>() == null || Physics.Bounds.Collides(go.GetComponent<SpriteRenderer>().bounds, Camera2D.main.CameraBounds));
         }
 
         private void DrawScene(SpriteBatch spriteBatch, GameTime gameTime)
@@ -475,7 +476,7 @@ namespace CrimsonEngine
 
             graphicsDevice.Clear(backgroundColor);
 
-            spriteBatch.Begin(transformMatrix: Camera2D.main.TranslationMatrix, samplerState: SamplerState.PointClamp);
+            spriteBatch.Begin(transformMatrix: Camera2D.main.TranslationMatrix, samplerState: SamplerState.PointClamp, sortMode: SpriteSortMode.Deferred);
 
             foreach (GameObject go in ActiveGameObjects)
             {
@@ -491,7 +492,7 @@ namespace CrimsonEngine
 
             graphicsDevice.Clear(new Color(0.5f, 0.5f, 1.0f));
 
-            spriteBatch.Begin(transformMatrix: Camera2D.main.TranslationMatrix, samplerState: SamplerState.PointClamp);
+            spriteBatch.Begin(transformMatrix: Camera2D.main.TranslationMatrix, samplerState: SamplerState.PointClamp, sortMode: SpriteSortMode.Deferred);
 
             foreach (GameObject go in ActiveGameObjects)
             {
@@ -515,7 +516,7 @@ namespace CrimsonEngine
 
             // using this, we can calculate a float from 0-1 representing the depth of a game object
             Effect colorFill = ResourceManager.GetResource<Effect>("Color Fill");
-            spriteBatch.Begin(effect: colorFill, transformMatrix: Camera2D.main.TranslationMatrix, samplerState: SamplerState.PointClamp, blendState: BlendState.AlphaBlend, sortMode: SpriteSortMode.BackToFront);
+            spriteBatch.Begin(effect: colorFill, transformMatrix: Camera2D.main.TranslationMatrix, samplerState: SamplerState.PointClamp, blendState: BlendState.AlphaBlend, sortMode: SpriteSortMode.Deferred);
             float currentDepth = minDepth;
             foreach (GameObject go in ActiveGameObjects)
             {
@@ -525,7 +526,7 @@ namespace CrimsonEngine
                     {
                         currentDepth = go.transform.GlobalPosition.z;
                         spriteBatch.End();
-                        spriteBatch.Begin(effect: colorFill, transformMatrix: Camera2D.main.TranslationMatrix, samplerState: SamplerState.PointClamp, blendState: BlendState.AlphaBlend, sortMode: SpriteSortMode.BackToFront);
+                        spriteBatch.Begin(effect: colorFill, transformMatrix: Camera2D.main.TranslationMatrix, samplerState: SamplerState.PointClamp, blendState: BlendState.AlphaBlend, sortMode: SpriteSortMode.Deferred);
                     }
                     float depthValue = (((go.transform.GlobalPosition.z - minDepth) / depthRange) * 0.8f);
                     colorFill.Parameters["color"].SetValue(new Vector3(depthValue, depthValue, depthValue));
