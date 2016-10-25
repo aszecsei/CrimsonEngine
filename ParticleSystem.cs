@@ -89,7 +89,8 @@ namespace CrimsonEngine
 
         public override void Initialize(Particle p)
         {
-            p.velocity = new Vector2(p.random.Next(-5, 5), 0);
+            p.velocity += new Vector2(p.random.Next(-5, 5), 0);
+            p.angularVelocity += (float)p.random.NextDouble() * 10 - 5;
             p.scale = new Vector2(0.25f, 0.25f);
             p.initialLifetime = (float)p.random.NextDouble() * 2 + 3;
         }
@@ -126,6 +127,9 @@ namespace CrimsonEngine
         public int randomSeed { set { _useRandomSeed = true; _randomSeed = value; } }
         private bool _useRandomSeed = false;
         public Space space = Space.World;
+        public bool inheritVelocity = false;
+
+        private Vector3 lastPosition;
 
         public float lifetime = 5.0f;
 
@@ -136,6 +140,16 @@ namespace CrimsonEngine
             T result = new T();
             components.Add(result);
             return result;
+        }
+
+        public int GetParticles(int numParticles, ref Particle[] p)
+        {
+            int actualReturn = (int)Mathf.Min(numParticles, _numParticles);
+            for(int i=0; i<actualReturn; i++)
+            {
+                p[i] = _particles[i];
+            }
+            return actualReturn;
         }
 
         public uint Emit(int i)
@@ -164,6 +178,12 @@ namespace CrimsonEngine
                     _particles[_numParticles].position = transform.GlobalPosition;
                 else
                     _particles[_numParticles].position = Vector2.zero;
+
+                if(inheritVelocity)
+                {
+                    Vector3 objvel = transform.GlobalPosition - lastPosition;
+                    _particles[_numParticles].velocity = objvel;
+                }
 
                 foreach(ParticleComponent pc in components)
                 {
@@ -284,18 +304,26 @@ namespace CrimsonEngine
                 random = new Random(_randomSeed);
             else
                 random = new Random();
+
+            lastPosition = transform.GlobalPosition;
         }
 
         void Update()
         {
-            if(!fixedUpdate)
+            if (!fixedUpdate)
+            {
                 Simulate(Time.deltaTime);
+                lastPosition = transform.GlobalPosition;
+            }
         }
 
         void FixedUpdate()
         {
             if (fixedUpdate)
+            {
                 Simulate(Time.actualFixedDeltaTime);
+                lastPosition = transform.GlobalPosition;
+            }
         }
     }
 }
