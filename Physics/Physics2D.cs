@@ -488,7 +488,10 @@ namespace CrimsonEngine.Physics
                             (go.layer & layerMask) == PhysicsLayer.None || // Test if we're hitting our masked layers
                              go.transform.GlobalPosition.z < minDepth || // Test if we've exceeded our minimum depth
                              go.transform.GlobalPosition.z > maxDepth) // Test if we've exceeded our maximum depth
+                        {
+                            rh = null;
                             return -1;
+                        }
                         rh.rigidbody = r;
                     }
                 }

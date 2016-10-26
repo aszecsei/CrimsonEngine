@@ -90,6 +90,7 @@ namespace CrimsonEngine
             // All GameObjects have a transform
             AddComponent<Transform>();
             SceneManager.CurrentScene.InstantiatedGameObjects.Add(this);
+            this.layer = Layer.GetLayer(Constants.DEFAULT_LAYER);
         }
 
         public GameObject(string name)
