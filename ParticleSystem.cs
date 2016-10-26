@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CrimsonEngine.Physics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -129,6 +130,9 @@ namespace CrimsonEngine
         public Space space = Space.World;
         public bool inheritVelocity = false;
 
+        private Vector2 min = new Vector2(Mathf.INFINITY, Mathf.INFINITY);
+        private Vector2 max = new Vector2(Mathf.NEGATIVE_INFINITY, Mathf.NEGATIVE_INFINITY);
+
         private Vector3 lastPosition;
 
         public float lifetime = 5.0f;
@@ -238,12 +242,25 @@ namespace CrimsonEngine
 
                 p.position += p.velocity * deltaTime;
                 p.rotation += p.angularVelocity * deltaTime;
+                if (p.position.x > max.x)
+                    max.x = p.position.x;
+                if (p.position.x < min.x)
+                    min.x = p.position.x;
+                if (p.position.y > max.y)
+                    max.y = p.position.y;
+                if (p.position.y < min.y)
+                    min.y = p.position.y;
             }
             foreach (ParticleComponent pc in components)
             {
                 pc.UpdateParticleSystem(this, deltaTime);
             }
             Flush();
+        }
+
+        public override Bounds Bounds()
+        {
+            return new Physics.Bounds(max.y, min.x, min.y, max.x);
         }
 
         public override void DrawDiffuse(SpriteBatch spriteBatch, GameTime gameTime)

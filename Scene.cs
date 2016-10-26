@@ -469,7 +469,7 @@ namespace CrimsonEngine
 
         private bool shouldDraw(GameObject go)
         {
-            return go.activeInHierarchy && (go.transform.GlobalPosition.z >= Camera2D.main.transform.GlobalPosition.z) && go.hasRenderer && (go.GetComponent<SpriteRenderer>() == null || Physics.Bounds.Collides(go.GetComponent<SpriteRenderer>().bounds, Camera2D.main.CameraBounds));
+            return go.activeInHierarchy && (go.transform.GlobalPosition.z >= Camera2D.main.transform.GlobalPosition.z) && go.hasRenderer && Bounds.Collides(go.getRenderer.Bounds(), Camera2D.main.CameraBounds);
         }
 
         private void DrawScene(SpriteBatch spriteBatch, GameTime gameTime)

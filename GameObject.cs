@@ -233,6 +233,18 @@ namespace CrimsonEngine
             }
         }
 
+        internal Renderer getRenderer
+        {
+            get
+            {
+                var renderers = Components.Values.OfType<Renderer>();
+                if (renderers.Count() == 0)
+                    return null;
+                else
+                    return renderers.First();
+            }
+        }
+
         internal void DrawDiffuse(SpriteBatch spriteBatch, GameTime gameTime)
         {
             var renderers = Components.Values.OfType<Renderer>();

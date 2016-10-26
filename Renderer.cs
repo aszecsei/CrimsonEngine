@@ -11,6 +11,8 @@ namespace CrimsonEngine
 {
     public abstract class Renderer : Component
     {
+        public abstract Physics.Bounds Bounds();
+
         public abstract void DrawDiffuse(SpriteBatch spriteBatch, GameTime gameTime);
 
         public abstract void DrawNormal(SpriteBatch spriteBatch, GameTime gameTime);
