@@ -10,6 +10,7 @@ namespace CrimsonEngine.Physics
     [Flags]
     public enum PhysicsLayer : int
     {
+        None = Category.None,
         AllLayers = Category.All,
         Layer1 = Category.Cat1,
         Layer2 = Category.Cat2,
@@ -41,7 +42,6 @@ namespace CrimsonEngine.Physics
         Layer28 = Category.Cat28,
         Layer29 = Category.Cat29,
         Layer30 = Category.Cat30,
-        Layer31 = Category.Cat31,
-        None = Category.None
+        Layer31 = Category.Cat31
     }
 }
