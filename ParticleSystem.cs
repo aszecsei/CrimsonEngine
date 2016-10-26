@@ -254,7 +254,7 @@ namespace CrimsonEngine
 
                 if (p.material.DiffuseTexture != null)
                 {
-                    spriteBatch.Draw(p.material.DiffuseTexture, position: Vector2.Scale(new Vector2(1, -1), p.position + ((space == Space.World) ? Vector2.zero : (Vector2)transform.GlobalPosition)), color: p.color, rotation: p.rotation, scale: p.scale);
+                    spriteBatch.Draw(p.material.DiffuseTexture, position: Vector2.Scale(Vector2.downRight, p.position + ((space == Space.World) ? Vector2.zero : (Vector2)transform.GlobalPosition)), color: p.color, rotation: p.rotation, scale: p.scale);
                 }
                 else
                 {
@@ -271,7 +271,7 @@ namespace CrimsonEngine
 
                 if (p.material.EmissiveTexture != null)
                 {
-                    spriteBatch.Draw(p.material.EmissiveTexture, position: Vector2.Scale(new Vector2(1, -1), p.position + ((space == Space.World) ? Vector2.zero : (Vector2)transform.GlobalPosition)), color: p.color, rotation: p.rotation, scale: p.scale);
+                    spriteBatch.Draw(p.material.EmissiveTexture, position: Vector2.Scale(Vector2.downRight, p.position + ((space == Space.World) ? Vector2.zero : (Vector2)transform.GlobalPosition)), color: p.color, rotation: p.rotation, scale: p.scale);
                 }
                 else
                 {
@@ -288,7 +288,7 @@ namespace CrimsonEngine
 
                 if (p.material.NormalTexture != null)
                 {
-                    spriteBatch.Draw(p.material.NormalTexture, position: Vector2.Scale(new Vector2(1, -1), p.position + ((space == Space.World) ? Vector2.zero : (Vector2)transform.GlobalPosition)), color: p.color, rotation: p.rotation, scale: p.scale);
+                    spriteBatch.Draw(p.material.NormalTexture, position: Vector2.Scale(Vector2.downRight, p.position + ((space == Space.World) ? Vector2.zero : (Vector2)transform.GlobalPosition)), color: p.color, rotation: p.rotation, scale: p.scale);
                 }
                 else
                 {

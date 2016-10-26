@@ -163,6 +163,8 @@ namespace CrimsonEngine
 
             HandleAnimationUpdate();
 
+            HandleLateUpdate();
+
             // Insertion-sort the GameObject list
             // Since teleportation in the z-direction is rare!
             // So the sorting is often nearly-sorted.
@@ -361,6 +363,14 @@ namespace CrimsonEngine
             }
         }
 
+        private void HandleLateUpdate()
+        {
+            foreach(GameObject go in ActiveGameObjects)
+            {
+                go.SendMessage("LateUpdate");
+            }
+        }
+
         private void HandleCoroutines()
         {
             foreach (IEnumerator coroutine in Coroutines)
@@ -392,14 +402,6 @@ namespace CrimsonEngine
         private void HandleAnimationUpdate()
         {
 
-        }
-
-        private void HandleLateUpdate()
-        {
-            foreach(GameObject go in ActiveGameObjects)
-            {
-                go.SendMessage("LateUpdate");
-            }
         }
 
         private void HandleEndOfFrameCoroutines()

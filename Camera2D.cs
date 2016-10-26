@@ -26,9 +26,17 @@ namespace CrimsonEngine
         {
             get
             {
-                Vector2 topLeft = ScreenToWorld(new Vector2(0, 0));
-                Vector2 bottomRight = ScreenToWorld(ViewportCenter * 2f);
-                return new Physics.Bounds(topLeft.y, topLeft.x, bottomRight.y, bottomRight.x);
+                var tl = ScreenToWorld(Vector2.zero);
+                var tr = ScreenToWorld(new Vector2(SceneManager.CurrentScene.GraphicsDevice.Viewport.Width, 0));
+                var bl = ScreenToWorld(new Vector2(0, SceneManager.CurrentScene.GraphicsDevice.Viewport.Height));
+                var br = ScreenToWorld(new Vector2(SceneManager.CurrentScene.GraphicsDevice.Viewport.Width, SceneManager.CurrentScene.GraphicsDevice.Viewport.Height));
+                var min = new Vector2(
+                    MathHelper.Min(tl.x, MathHelper.Min(tr.x, MathHelper.Min(bl.x, br.x))),
+                    MathHelper.Min(tl.y, MathHelper.Min(tr.y, MathHelper.Min(bl.y, br.y))));
+                var max = new Vector2(
+                    MathHelper.Max(tl.x, MathHelper.Max(tr.x, MathHelper.Max(bl.x, br.x))),
+                    MathHelper.Max(tl.y, MathHelper.Max(tr.y, MathHelper.Max(bl.y, br.y))));
+                return new Physics.Bounds(max.y, min.x, min.y, max.x);
             }
         }
 
@@ -50,47 +58,30 @@ namespace CrimsonEngine
         {
             get
             {
-                return Matrix.CreateTranslation(-(int)transform.GlobalPosition.x, -(int)transform.GlobalPosition.y, 0) *
+                return Matrix.CreateTranslation(-transform.GlobalPosition.x, transform.GlobalPosition.y, 0) *
                        Matrix.CreateRotationZ(MathHelper.ToRadians(transform.GlobalRotation)) *
                        Matrix.CreateScale(new Vector3(Zoom, Zoom, 1)) *
                        Matrix.CreateTranslation((Vector3)ViewportCenter);
             }
         }
 
-        public Rectangle ViewportBounds
-        {
-            get
-            {
-                Vector2 viewportCorner = ScreenToWorld(new Vector2(0, 0));
-                Vector2 viewportBottomCorner = ScreenToWorld(SceneManager.CurrentScene.InternalResolution);
-                return new Rectangle((int)viewportCorner.x, (int)viewportCorner.y,
-                    (int)(viewportBottomCorner.x - viewportCorner.x),
-                    (int)(viewportBottomCorner.y - viewportCorner.y));
-            }
-        }
+        public Matrix InverseTranslationMatrix { get { return Matrix.Invert(TranslationMatrix); } }
 
         public Vector2 WorldToScreen(Vector2 worldPosition)
         {
-            Vector2 transformedWP = new Vector2(worldPosition.x, -1 * worldPosition.y);
-            Vector2 result = Vector2.Transform(transformedWP, TranslationMatrix);
-            return result;
-        }
-
-        public Vector2 ScreenToWorld(Vector2 screenPosition)
-        {
-            if(SceneManager.CurrentScene.InternalResolution != Vector2.zero)
-            {
-                screenPosition.x *= SceneManager.CurrentScene.InternalResolution.x / SceneManager.CurrentScene.GraphicsDevice.Viewport.Width;
-                screenPosition.y *= SceneManager.CurrentScene.InternalResolution.y / SceneManager.CurrentScene.GraphicsDevice.Viewport.Height;
-            }
-            Vector2 result = Vector2.Transform(screenPosition, Matrix.Invert(TranslationMatrix));
-            result.y *= -1;
-            return result;
+            Vector2 newWorld = Vector2.Scale(Vector2.downRight, worldPosition);
+            return Vector2.Transform(newWorld, TranslationMatrix);
         }
 
         public Vector3 WorldToScreen(Vector3 worldPosition)
         {
-            return Vector3.Transform(worldPosition, TranslationMatrix);
+            Vector3 newWorld = new Vector3(worldPosition.x, worldPosition.y * -1, worldPosition.z);
+            return Vector3.Transform(newWorld, TranslationMatrix);
+        }
+
+        public Vector2 ScreenToWorld(Vector2 screenPosition)
+        {
+            return Vector2.Scale(Vector2.downRight, Vector2.Transform(screenPosition, InverseTranslationMatrix));
         }
     }
 }

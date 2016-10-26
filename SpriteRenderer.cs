@@ -46,11 +46,11 @@ namespace CrimsonEngine
             if(material.DiffuseTexture != null)
             {
                 spriteBatch.Draw(texture: material.DiffuseTexture, 
-                    position: new Vector2(GameObject.transform.GlobalPosition.x, -GameObject.transform.GlobalPosition.y), 
+                    position: Vector2.Scale(Vector2.downRight, GameObject.transform.GlobalPosition), 
                     color: TintColor, 
                     rotation: GameObject.transform.GlobalRotation, 
                     origin: Origin, 
-                    scale: new Vector2(GameObject.transform.GlobalScale.x, GameObject.transform.GlobalScale.y),
+                    scale: GameObject.transform.GlobalScale,
                     effects:effect);
             }
             else
@@ -64,11 +64,11 @@ namespace CrimsonEngine
             if (material.NormalTexture != null)
             {
                 spriteBatch.Draw(texture: material.NormalTexture,
-                    position: new Vector2(GameObject.transform.GlobalPosition.x, -GameObject.transform.GlobalPosition.y),
+                    position: Vector2.Scale(Vector2.downRight, GameObject.transform.GlobalPosition),
                     color: TintColor,
                     rotation: GameObject.transform.GlobalRotation,
                     origin: Origin,
-                    scale: new Vector2(GameObject.transform.GlobalScale.x, GameObject.transform.GlobalScale.y),
+                    scale: GameObject.transform.GlobalScale,
                     effects:effect);
             }
             else
@@ -82,11 +82,11 @@ namespace CrimsonEngine
             if (material.EmissiveTexture != null)
             {
                 spriteBatch.Draw(texture: material.EmissiveTexture,
-                    position: new Vector2(GameObject.transform.GlobalPosition.x, -GameObject.transform.GlobalPosition.y),
+                    position: Vector2.Scale(Vector2.downRight, GameObject.transform.GlobalPosition),
                     color: TintColor,
                     rotation: GameObject.transform.GlobalRotation,
                     origin: Origin,
-                    scale: new Vector2(GameObject.transform.GlobalScale.x, GameObject.transform.GlobalScale.y),
+                    scale: GameObject.transform.GlobalScale,
                     effects:effect);
             }
             else
