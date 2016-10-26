@@ -67,18 +67,12 @@ namespace CrimsonEngine.Physics
         /// <summary>
         /// Layer mask constant that includes all layers participating in raycasts by default.
         /// </summary>
-        public const PhysicsLayer DefaultRaycastLayers = PhysicsLayer.AllLayers;
+        public static PhysicsLayer DefaultRaycastLayers { get { return ~IgnoreRaycastLayer; } }
 
         /// <summary>
         /// Layer mask constant for the default layer that ignores raycasts.
         /// </summary>
-        public static PhysicsLayer IgnoreRaycastLayer
-        {
-            get
-            {
-                return ~DefaultRaycastLayers;
-            }
-        }
+        public static PhysicsLayer IgnoreRaycastLayer { get { return Layer.GetLayer(Constants.IGNORE_RAYCAST_LAYER); } }
 
         /// <summary>
         /// A rigidbody cannot sleep if its linear velocity is above this tolerance.
@@ -316,10 +310,11 @@ namespace CrimsonEngine.Physics
         /// <param name="minDepth">Only include objects with a Z coordinate (depth) greater than or equal to this value.</param>
         /// <param name="maxDepth">Only include objects with a Z coordinate (depth) less than or equal to this value.</param>
         /// <returns>The cast results returned.</returns>
-        public static RaycastHit Linecast(Vector2 start, Vector2 end, PhysicsLayer layerMask = DefaultRaycastLayers, float minDepth = float.MinValue, float maxDepth = float.MaxValue)
+        public static RaycastHit Linecast(Vector2 start, Vector2 end, PhysicsLayer layerMask, float minDepth = float.MinValue, float maxDepth = float.MaxValue)
         {
-            // TODO: Implement this.
-            throw new NotImplementedException();
+            Vector2 direction = end - start;
+            float distance = direction.magnitude;
+            return Raycast(start, direction, layerMask, distance, minDepth, maxDepth);
         }
 
         /// <summary>
@@ -346,10 +341,11 @@ namespace CrimsonEngine.Physics
         /// <param name="minDepth">Only include objects with a Z coordinate (depth) greater than or equal to this value.</param>
         /// <param name="maxDepth">Only include objects with a Z coordinate (depth) less than or equal to this value.</param>
         /// <returns></returns>
-        public static RaycastHit[] LinecastAll(Vector2 start, Vector2 end, PhysicsLayer layerMask = DefaultRaycastLayers, float minDepth = float.MinValue, float maxDepth = float.MaxValue)
+        public static RaycastHit[] LinecastAll(Vector2 start, Vector2 end, PhysicsLayer layerMask, float minDepth = float.MinValue, float maxDepth = float.MaxValue)
         {
-            // TODO: Implement this.
-            throw new NotImplementedException();
+            Vector2 direction = end - start;
+            float distance = direction.magnitude;
+            return RaycastAll(start, direction, layerMask, distance, minDepth, maxDepth);
         }
 
         /// <summary>
@@ -376,10 +372,11 @@ namespace CrimsonEngine.Physics
         /// <param name="minDepth">Only include objects with a Z coordinate (depth) greater than or equal to this value.</param>
         /// <param name="maxDepth">Only include objects with a Z coordinate (depth) less than or equal to this value.</param>
         /// <returns></returns>
-        public static int LinecastNonAlloc(Vector2 start, Vector2 end, RaycastHit[] results, PhysicsLayer layerMask = DefaultRaycastLayers, float minDepth = float.MinValue, float maxDepth = float.MaxValue)
+        public static int LinecastNonAlloc(Vector2 start, Vector2 end, RaycastHit[] results, PhysicsLayer layerMask, float minDepth = float.MinValue, float maxDepth = float.MaxValue)
         {
-            // TODO: Implement this.
-            throw new NotImplementedException();
+            Vector2 direction = end - start;
+            float distance = direction.magnitude;
+            return RaycastNonAlloc(start, direction, results, layerMask, distance, minDepth, maxDepth);
         }
 
         /// <summary>
@@ -399,103 +396,116 @@ namespace CrimsonEngine.Physics
         /// <param name="minDepth">Only include objects with a Z coordinate (depth) greater than or equal to this value.</param>
         /// <param name="maxDepth">Only include objects with a Z coordinate (depth) less than or equal to this value.</param>
         /// <returns></returns>
-        public static Rigidbody OverlapArea(Vector2 pointA, Vector2 pointB, PhysicsLayer layerMask = DefaultRaycastLayers, float minDepth = float.MinValue, float maxDepth = float.MaxValue)
+        public static Rigidbody OverlapArea(Vector2 pointA, Vector2 pointB, PhysicsLayer layerMask, float minDepth = float.MinValue, float maxDepth = float.MaxValue)
         {
             // TODO: Implement this.
             throw new NotImplementedException();
         }
 
-        public static Rigidbody[] OverlapAreaAll(Vector2 pointA, Vector2 pointB, PhysicsLayer layerMask = DefaultRaycastLayers, float minDepth = float.MinValue, float maxDepth = float.MaxValue)
+        public static Rigidbody[] OverlapAreaAll(Vector2 pointA, Vector2 pointB, PhysicsLayer layerMask, float minDepth = float.MinValue, float maxDepth = float.MaxValue)
         {
             // TODO: Implement this.
             throw new NotImplementedException();
         }
 
-        public static int OverlapAreaNonAlloc(Vector2 pointA, Vector2 pointB, Rigidbody[] results, PhysicsLayer layerMask = DefaultRaycastLayers, float minDepth = float.MinValue, float maxDepth = float.MaxValue)
+        public static int OverlapAreaNonAlloc(Vector2 pointA, Vector2 pointB, Rigidbody[] results, PhysicsLayer layerMask, float minDepth = float.MinValue, float maxDepth = float.MaxValue)
         {
             // TODO: Implement this.
             throw new NotImplementedException();
         }
 
-        public static Rigidbody OverlapBox(Vector2 point, Vector2 size, float angle, PhysicsLayer layerMask = DefaultRaycastLayers, float minDepth = float.MinValue, float maxDepth = float.MaxValue)
+        public static Rigidbody OverlapBox(Vector2 point, Vector2 size, float angle, PhysicsLayer layerMask, float minDepth = float.MinValue, float maxDepth = float.MaxValue)
         {
             // TODO: Implement this.
             throw new NotImplementedException();
         }
 
-        public static Rigidbody[] OverlapBoxAll(Vector2 point, Vector2 size, float angle, PhysicsLayer layerMask = DefaultRaycastLayers, float minDepth = float.MinValue, float maxDepth = float.MaxValue)
+        public static Rigidbody[] OverlapBoxAll(Vector2 point, Vector2 size, float angle, PhysicsLayer layerMask, float minDepth = float.MinValue, float maxDepth = float.MaxValue)
         {
             // TODO: Implement this.
             throw new NotImplementedException();
         }
 
-        public static int OverlapBoxNonAlloc(Vector2 point, Vector2 size, float angle, Rigidbody[] results, PhysicsLayer layerMask = DefaultRaycastLayers, float minDepth = float.MinValue, float maxDepth = float.MaxValue)
+        public static int OverlapBoxNonAlloc(Vector2 point, Vector2 size, float angle, Rigidbody[] results, PhysicsLayer layerMask, float minDepth = float.MinValue, float maxDepth = float.MaxValue)
         {
             // TODO: Implement this.
             throw new NotImplementedException();
         }
 
-        public static Rigidbody OverlapCircle(Vector2 point, float radius, PhysicsLayer layerMask = DefaultRaycastLayers, float minDepth = float.MinValue, float maxDepth = float.MaxValue)
+        public static Rigidbody OverlapCircle(Vector2 point, float radius, PhysicsLayer layerMask, float minDepth = float.MinValue, float maxDepth = float.MaxValue)
         {
             // TODO: Implement this.
             throw new NotImplementedException();
         }
 
-        public static Rigidbody[] OverlapCircleAll(Vector2 point, float radius, PhysicsLayer layerMask = DefaultRaycastLayers, float minDepth = float.MinValue, float maxDepth = float.MaxValue)
+        public static Rigidbody[] OverlapCircleAll(Vector2 point, float radius, PhysicsLayer layerMask, float minDepth = float.MinValue, float maxDepth = float.MaxValue)
         {
             // TODO: Implement this.
             throw new NotImplementedException();
         }
 
-        public static Rigidbody[] OverlapCircleNonAlloc(Vector2 point, float radius, Rigidbody[] results, PhysicsLayer layerMask = DefaultRaycastLayers, float minDepth = float.MinValue, float maxDepth = float.MaxValue)
+        public static Rigidbody[] OverlapCircleNonAlloc(Vector2 point, float radius, Rigidbody[] results, PhysicsLayer layerMask, float minDepth = float.MinValue, float maxDepth = float.MaxValue)
         {
             // TODO: Implement this.
             throw new NotImplementedException();
         }
 
-        public static Rigidbody OverlapPoint(Vector2 point, PhysicsLayer layerMask = DefaultRaycastLayers, float minDepth = float.MinValue, float maxDepth = float.MaxValue)
+        public static Rigidbody OverlapPoint(Vector2 point, PhysicsLayer layerMask, float minDepth = float.MinValue, float maxDepth = float.MaxValue)
         {
             // TODO: Implement this.
             throw new NotImplementedException();
         }
 
-        public static Rigidbody[] OverlapPointAll(Vector2 point, PhysicsLayer layerMask = DefaultRaycastLayers, float minDepth = float.MinValue, float maxDepth = float.MaxValue)
+        public static Rigidbody[] OverlapPointAll(Vector2 point, PhysicsLayer layerMask, float minDepth = float.MinValue, float maxDepth = float.MaxValue)
         {
             // TODO: Implement this.
             throw new NotImplementedException();
         }
 
-        public static int OverlapPointNonAlloc(Vector2 point, Rigidbody[] results, PhysicsLayer layerMask = DefaultRaycastLayers, float minDepth = float.MinValue, float maxDepth = float.MaxValue)
+        public static int OverlapPointNonAlloc(Vector2 point, Rigidbody[] results, PhysicsLayer layerMask, float minDepth = float.MinValue, float maxDepth = float.MaxValue)
         {
             // TODO: Implement this.
             throw new NotImplementedException();
         }
 
-        public static RaycastHit Raycast(Vector2 origin, Vector2 direction, float distance = float.MaxValue, PhysicsLayer layerMask = DefaultRaycastLayers, float minDepth = float.MinValue, float maxDepth = float.MaxValue)
+        private static float GenerateRaycast(out RaycastHit rh, bool findOnlyOne, Vector2 origin, PhysicsLayer layerMask, float distance, float minDepth, float maxDepth, Fixture fixture, Microsoft.Xna.Framework.Vector2 point, Microsoft.Xna.Framework.Vector2 normal, float fraction)
+        {
+            rh = new RaycastHit();
+            rh.centroid = origin;
+            rh.collider = fixture;
+            rh.distance = Vector2.Distance(point * unitToPixel, origin);
+            rh.fraction = fraction * unitToPixel;
+            rh.normal = normal * unitToPixel;
+            rh.point = point * unitToPixel;
+            foreach (GameObject go in SceneManager.CurrentScene.ActiveGameObjects)
+            {
+                Rigidbody r = go.GetComponent<Rigidbody>();
+                if (r != null)
+                {
+                    if (r.body.FixtureList.Contains(fixture))
+                    {
+                        if ((go.layer & Physics2D.IgnoreRaycastLayer) != PhysicsLayer.None || // Test if we're ignoring raycasts
+                            (go.layer & layerMask) == PhysicsLayer.None || // Test if we're hitting our masked layers
+                             go.transform.GlobalPosition.z < minDepth || // Test if we've exceeded our minimum depth
+                             go.transform.GlobalPosition.z > maxDepth) // Test if we've exceeded our maximum depth
+                            return -1;
+                        rh.rigidbody = r;
+                    }
+                }
+            }
+            rh.transform = rh.rigidbody.GameObject.transform;
+            if (findOnlyOne)
+                return fraction;
+            else
+                return 1;
+        }
+
+        public static RaycastHit Raycast(Vector2 origin, Vector2 direction, PhysicsLayer layerMask, float distance = float.MaxValue, float minDepth = float.MinValue, float maxDepth = float.MaxValue)
         {
             RaycastHit rh = null;
             Func<Fixture, Microsoft.Xna.Framework.Vector2, Microsoft.Xna.Framework.Vector2, float, float> get_first_callback = delegate (Fixture fixture, Microsoft.Xna.Framework.Vector2 point, Microsoft.Xna.Framework.Vector2 normal, float fraction)
             {
-                rh = new RaycastHit();
-                rh.centroid = origin;
-                rh.collider = fixture;
-                rh.distance = Vector2.Distance(point * unitToPixel, origin);
-                rh.fraction = fraction * unitToPixel;
-                rh.normal = normal * unitToPixel;
-                rh.point = point * unitToPixel;
-                foreach(GameObject go in SceneManager.CurrentScene.ActiveGameObjects)
-                {
-                    Rigidbody r = go.GetComponent<Rigidbody>();
-                    if (r != null)
-                    {
-                        if(r.body.FixtureList.Contains(fixture))
-                        {
-                            rh.rigidbody = r;
-                        }
-                    }
-                }
-                rh.transform = rh.rigidbody.GameObject.transform;
-                return fraction;
+                return GenerateRaycast(out rh, true, origin, layerMask, distance, minDepth, maxDepth, fixture, point, normal, fraction);
             };
 
             Vector2 point2 = new Vector2(direction.x, direction.y);
@@ -506,16 +516,49 @@ namespace CrimsonEngine.Physics
             return rh;
         }
 
-        public static RaycastHit[] RaycastAll(Vector2 origin, Vector2 direction, float distance = float.MaxValue, PhysicsLayer layerMask = DefaultRaycastLayers, float minDepth = float.MinValue, float maxDepth = float.MaxValue)
+        public static RaycastHit[] RaycastAll(Vector2 origin, Vector2 direction, PhysicsLayer layerMask, float distance = float.MaxValue, float minDepth = float.MinValue, float maxDepth = float.MaxValue)
         {
-            // TODO: Implement this.
-            throw new NotImplementedException();
+            List<RaycastHit> hits = new List<RaycastHit>();
+            RaycastHit rh;
+            Func<Fixture, Microsoft.Xna.Framework.Vector2, Microsoft.Xna.Framework.Vector2, float, float> get_first_callback = delegate (Fixture fixture, Microsoft.Xna.Framework.Vector2 point, Microsoft.Xna.Framework.Vector2 normal, float fraction)
+            {
+                float result = GenerateRaycast(out rh, false, origin, layerMask, distance, minDepth, maxDepth, fixture, point, normal, fraction);
+                if(result != -1)
+                {
+                    hits.Add(rh);
+                }
+                return result;
+            };
+
+            Vector2 point2 = new Vector2(direction.x, direction.y);
+            point2.Normalize();
+            point2 *= distance;
+            point2 += origin;
+            world.RayCast(get_first_callback, origin * pixelToUnit, point2 * pixelToUnit);
+            return hits.ToArray();
         }
 
-        public static int RaycastNonAlloc(Vector2 origin, Vector2 direction, RaycastHit[] results, float distance = float.MaxValue, PhysicsLayer layerMask = DefaultRaycastLayers, float minDepth = float.MinValue, float maxDepth = float.MaxValue)
+        public static int RaycastNonAlloc(Vector2 origin, Vector2 direction, RaycastHit[] results, PhysicsLayer layerMask, float distance = float.MaxValue, float minDepth = float.MinValue, float maxDepth = float.MaxValue)
         {
-            // TODO: Implement this.
-            throw new NotImplementedException();
+            int counter = 0;
+            RaycastHit rh;
+            Func<Fixture, Microsoft.Xna.Framework.Vector2, Microsoft.Xna.Framework.Vector2, float, float> get_first_callback = delegate (Fixture fixture, Microsoft.Xna.Framework.Vector2 point, Microsoft.Xna.Framework.Vector2 normal, float fraction)
+            {
+                float result = GenerateRaycast(out rh, false, origin, layerMask, distance, minDepth, maxDepth, fixture, point, normal, fraction);
+                if (result != -1 && counter < results.Length)
+                {
+                    results[counter] = rh;
+                    counter++;
+                }
+                return result;
+            };
+
+            Vector2 point2 = new Vector2(direction.x, direction.y);
+            point2.Normalize();
+            point2 *= distance;
+            point2 += origin;
+            world.RayCast(get_first_callback, origin * pixelToUnit, point2 * pixelToUnit);
+            return counter;
         }
 
         public static void SetLayerCollisionMask(PhysicsLayer layer, PhysicsLayer layerMask)
