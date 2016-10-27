@@ -303,6 +303,11 @@ namespace CrimsonEngine
             return (float)Math.Sign(f);
         }
 
+        public static float Sin(float f)
+        {
+            return (float)Math.Sin(f);
+        }
+
         public static float SmoothDamp(float current, float target, ref float currentVelocity, float smoothTime, float deltaTime, float maxSpeed = Mathf.INFINITY)
         {
             float d = current;

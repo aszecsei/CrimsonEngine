@@ -52,12 +52,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AnimationCurve.cs" />
+    <Compile Include="AudioListener.cs" />
+    <Compile Include="AudioSource.cs" />
     <Compile Include="Camera2D.cs" />
     <Compile Include="Color.cs" />
     <Compile Include="Component.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Coroutine.cs" />
     <Compile Include="Debug.cs" />
+    <Compile Include="EasingFunctions.cs" />
     <Compile Include="GameObject.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="InputManager.cs" />
